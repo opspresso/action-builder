@@ -2,7 +2,7 @@
 
 set -e
 
-CMD=$2
+CMD=$1
 
 if [ -z "${CMD}" ]; then
   exit 0
@@ -182,21 +182,21 @@ _slack() {
 }
 
 # case "${CMD}" in
-#   publish)
+#   --publish|publish)
 #     _publish
 #     ;;
-#   release)
+#   --release|release)
 #     _release
 #     ;;
-#   slack)
+#   --slack|slack)
 #     _slack
 #     ;;
 # esac
 
-if [ "${CMD}" == "publish" ]; then
+if [ "${CMD}" == "--publish" ]; then
   _publish
-elif [ "${CMD}" == "release" ]; then
+elif [ "${CMD}" == "--release" ]; then
   _release
-elif [ "${CMD}" == "slack" ]; then
+elif [ "${CMD}" == "--slack" ]; then
   _slack
 fi
