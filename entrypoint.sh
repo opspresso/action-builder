@@ -96,6 +96,7 @@ _commit() {
   git config --global user.email "${GIT_USEREMAIL}"
 
   git branch -a -v
+  git remote
 
   echo "git remote add opspresso github.com/${GITHUB_REPOSITORY}"
   git remote add opspresso https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
@@ -105,6 +106,9 @@ _commit() {
 
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
+
+  git branch -a -v
+  git remote
 
   echo "git push -u opspresso ${GIT_BRANCH}"
   git push -u opspresso ${GIT_BRANCH}
