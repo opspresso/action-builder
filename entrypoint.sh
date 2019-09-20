@@ -103,11 +103,11 @@ _commit() {
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
 
-  echo "git remote add builder github.com/${GITHUB_REPOSITORY}"
-  git remote add builder https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+  echo "git remote add opspresso github.com/${GITHUB_REPOSITORY}"
+  git remote add opspresso https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
-  echo "git push -u builder ${GIT_BRANCH}"
-  git push -u builder ${GIT_BRANCH}
+  echo "git push -u opspresso ${GIT_BRANCH}"
+  git push -u opspresso ${GIT_BRANCH}
 
   # echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   # git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
