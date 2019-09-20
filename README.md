@@ -16,10 +16,15 @@ jobs:
       with:
         fetch-depth: 1
 
+    - name: Bump Version
+      uses: opspresso/action-builder@master
+      with:
+        args: --version
+
     - name: Publish
       uses: opspresso/action-builder@master
       with:
-        args: publish
+        args: --publish
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -31,15 +36,15 @@ jobs:
     - name: Release
       uses: opspresso/action-builder@master
       with:
-        args: release
+        args: --release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG_NAME: "v0.0.1"
 
-    - name: Slack
+    - name: Post to Slack
       uses: opspresso/action-builder@master
       with:
-        args: slack
+        args: --slack
       env:
         SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         JSON_PATH: ./target/slack_message.json

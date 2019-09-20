@@ -12,6 +12,58 @@ _prepare() {
   mkdir -p target
 }
 
+_version() {
+    if [ ! -f ./VERSION ]; then
+        printf "v0.0.x" > ./VERSION
+    fi
+
+    echo "GITHUB_REF: ${GITHUB_REF}"
+
+    # release version
+    MAJOR=$(cat ./VERSION | xargs | cut -d'.' -f1)
+    MINOR=$(cat ./VERSION | xargs | cut -d'.' -f2)
+    PATCH=$(cat ./VERSION | xargs | cut -d'.' -f3)
+
+    if [ "${PATCH}" != "x" ]; then
+        VERSION="${MAJOR}.${MINOR}.${PATCH}"
+        printf "${VERSION}" > ./target/VERSION
+    else
+        # latest versions
+        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+        VERSION=$(curl -s ${URL} | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
+
+        if [ -z ${VERSION} ]; then
+            VERSION="${MAJOR}.${MINOR}.0"
+        fi
+
+        echo "VERSION: ${VERSION}"
+
+        # new version
+        if [ "${BRANCH}" == "refs/heads/master" ]; then
+            VERSION=$(echo ${VERSION} | perl -pe 's/^(([v\d]+\.)*)(\d+)(.*)$/$1.($3+1).$4/e')
+        else
+            if [ "${BRANCH}" != "" ]; then
+                # refs/pull/1/merge
+                PR_CMD=$(echo "${BRANCH}" | cut -d'/' -f2)
+                PR_NUM=$(echo "${BRANCH}" | cut -d'/' -f3)
+            fi
+
+            if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
+                VERSION="${VERSION}-${PR_NUM}"
+                echo ${PR_NUM} > ./target/PR
+            else
+                VERSION=""
+            fi
+        fi
+
+        if [ "${VERSION}" != "" ]; then
+            printf "${VERSION}" > ./target/VERSION
+        fi
+    fi
+
+    echo "VERSION: ${VERSION}"
+}
+
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
     echo "AWS_ACCESS_KEY_ID is not set."
@@ -186,6 +238,9 @@ _slack() {
 _prepare
 
 case "${CMD}" in
+  --version|version)
+    _version
+    ;;
   --publish|publish)
     _publish
     ;;
