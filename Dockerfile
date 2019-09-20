@@ -1,4 +1,4 @@
-FROM opspresso:awscli
+FROM opspresso:builder
 
 LABEL "com.github.actions.name"="Opspresso Builder"
 LABEL "com.github.actions.description"="GitHub Action Builder"
