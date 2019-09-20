@@ -10,6 +10,10 @@ fi
 
 echo "[${CMD}] start..."
 
+_prepare() {
+  mkdir -p target
+}
+
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
     echo "AWS_ACCESS_KEY_ID is not set."
@@ -181,6 +185,8 @@ _slack() {
     ${URL}
 }
 
+_prepare
+
 case "${CMD}" in
   --publish|publish)
     _publish
@@ -192,11 +198,3 @@ case "${CMD}" in
     _slack
     ;;
 esac
-
-# if [ "${CMD}" == "--publish" ]; then
-#   _publish
-# elif [ "${CMD}" == "--release" ]; then
-#   _release
-# elif [ "${CMD}" == "--slack" ]; then
-#   _slack
-# fi
