@@ -85,6 +85,12 @@ _commit_pre() {
   if [ -z "${GIT_BRANCH}" ]; then
     GIT_BRANCH="master"
   fi
+
+  if [ -z "${MESSAGE}" ]; then
+    if [ ! -z "${MESSAGE_PATH}" ] && [ -f "${MESSAGE_PATH}" ]; then
+      MESSAGE="$(cat ${MESSAGE_PATH})"
+    fi
+  fi
 }
 
 _commit() {
