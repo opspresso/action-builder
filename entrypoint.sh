@@ -8,7 +8,7 @@ if [ -z "${CMD}" ]; then
   exit 0
 fi
 
-echo "${CMD} start..."
+echo "[${CMD}] start..."
 
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
@@ -181,16 +181,22 @@ _slack() {
     ${URL}
 }
 
-case "${CMD}" in
-  publish)
-    _publish
-    ;;
-  release)
-    _release
-    ;;
-  slack)
-    _slack
-    ;;
-esac
+# case "${CMD}" in
+#   publish)
+#     _publish
+#     ;;
+#   release)
+#     _release
+#     ;;
+#   slack)
+#     _slack
+#     ;;
+# esac
 
-exit 0
+if [ "${CMD}" == "publish" ]; then
+  _publish
+elif [ "${CMD}" == "release" ]; then
+  _release
+elif [ "${CMD}" == "slack" ]; then
+  _slack
+fi
