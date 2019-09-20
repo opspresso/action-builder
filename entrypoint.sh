@@ -93,7 +93,7 @@ _commit() {
   git config --global user.name "${GIT_USERNAME}"
   git config --global user.email "${GIT_USEREMAIL}"
 
-  git branch
+  git branch --all
 
   echo "git add --all"
   git add --all
@@ -102,7 +102,7 @@ _commit() {
   git commit -a --allow-empty-message -m "${MESSAGE}"
 
   echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
-  git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
+  git push --force -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
 }
 
 _publish_pre() {
