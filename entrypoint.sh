@@ -8,66 +8,74 @@ fi
 
 echo "[${CMD}] start..."
 
+_error() {
+  echo -e "$1"
+
+  if [ ! -z "${LOOSE_ERROR}" ]; then
+    exit 0
+  else
+    exit 1
+  fi
+}
+
 _version() {
-    if [ ! -f ./VERSION ]; then
-        printf "v0.0.x" > ./VERSION
-    fi
+  if [ ! -f ./VERSION ]; then
+    printf "v0.0.x" > ./VERSION
+  fi
 
-    echo "GITHUB_REF: ${GITHUB_REF}"
+  echo "GITHUB_REF: ${GITHUB_REF}"
 
-    # release version
-    MAJOR=$(cat ./VERSION | xargs | cut -d'.' -f1)
-    MINOR=$(cat ./VERSION | xargs | cut -d'.' -f2)
-    PATCH=$(cat ./VERSION | xargs | cut -d'.' -f3)
+  # release version
+  MAJOR=$(cat ./VERSION | xargs | cut -d'.' -f1)
+  MINOR=$(cat ./VERSION | xargs | cut -d'.' -f2)
+  PATCH=$(cat ./VERSION | xargs | cut -d'.' -f3)
 
-    if [ "${PATCH}" != "x" ]; then
-        VERSION="${MAJOR}.${MINOR}.${PATCH}"
-        printf "${VERSION}" > ./VERSION
-    else
-        # latest versions
-        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-        VERSION=$(curl -s ${URL} | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
+  if [ "${PATCH}" != "x" ]; then
+    VERSION="${MAJOR}.${MINOR}.${PATCH}"
+    printf "${VERSION}" > ./VERSION
+  else
+    # latest versions
+    URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+    VERSION=$(curl -s ${URL} | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
 
-        if [ -z ${VERSION} ]; then
-            VERSION="${MAJOR}.${MINOR}.0"
-        fi
-
-        echo "VERSION: ${VERSION}"
-
-        # new version
-        if [ "${GITHUB_REF}" == "refs/heads/master" ]; then
-            VERSION=$(echo ${VERSION} | perl -pe 's/^(([v\d]+\.)*)(\d+)(.*)$/$1.($3+1).$4/e')
-        else
-            if [ "${GITHUB_REF}" != "" ]; then
-                # refs/pull/1/merge
-                PR_CMD=$(echo "${GITHUB_REF}" | cut -d'/' -f2)
-                PR_NUM=$(echo "${GITHUB_REF}" | cut -d'/' -f3)
-            fi
-
-            if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
-                VERSION="${VERSION}-${PR_NUM}"
-            else
-                VERSION=""
-            fi
-        fi
-
-        if [ "${VERSION}" != "" ]; then
-            printf "${VERSION}" > ./VERSION
-        fi
+    if [ -z ${VERSION} ]; then
+      VERSION="${MAJOR}.${MINOR}.0"
     fi
 
     echo "VERSION: ${VERSION}"
+
+    # new version
+    if [ "${GITHUB_REF}" == "refs/heads/master" ]; then
+      VERSION=$(echo ${VERSION} | perl -pe 's/^(([v\d]+\.)*)(\d+)(.*)$/$1.($3+1).$4/e')
+    else
+      if [ "${GITHUB_REF}" != "" ]; then
+        # refs/pull/1/merge
+        PR_CMD=$(echo "${GITHUB_REF}" | cut -d'/' -f2)
+        PR_NUM=$(echo "${GITHUB_REF}" | cut -d'/' -f3)
+      fi
+
+      if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
+        VERSION="${VERSION}-${PR_NUM}"
+      else
+        VERSION=""
+      fi
+    fi
+
+    if [ "${VERSION}" != "" ]; then
+      printf "${VERSION}" > ./VERSION
+    fi
+  fi
+
+  echo "VERSION: ${VERSION}"
 }
 
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
-    echo "AWS_ACCESS_KEY_ID is not set."
-    exit 1
+    _error "AWS_ACCESS_KEY_ID is not set."
   fi
 
   if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
-    echo "AWS_SECRET_ACCESS_KEY is not set."
-    exit 1
+    _error "AWS_SECRET_ACCESS_KEY is not set."
   fi
 
   if [ -z "${AWS_REGION}" ]; then
@@ -79,8 +87,7 @@ _publish_pre() {
   fi
 
   if [ -z "${DEST_PATH}" ]; then
-    echo "DEST_PATH is not set."
-    exit 1
+    _error "DEST_PATH is not set."
   fi
 }
 
@@ -99,8 +106,7 @@ EOF
 
 _release_pre() {
   if [ -z "${GITHUB_TOKEN}" ]; then
-    echo "GITHUB_TOKEN is not set."
-    exit 1
+    _error "GITHUB_TOKEN is not set."
   fi
 
   if [ -z "${TAG_NAME}" ]; then
@@ -112,8 +118,7 @@ _release_pre() {
       TAG_NAME=$(cat ./VERSION | xargs)
     fi
     if [ -z "${TAG_NAME}" ]; then
-      echo "TAG_NAME is not set."
-      exit 1
+      _error "TAG_NAME is not set."
     fi
   fi
 
@@ -199,8 +204,7 @@ END
 
   _release_id
   if [ -z "${RELEASE_ID}" ]; then
-    echo "RELEASE_ID is not set."
-    exit 1
+    _error "RELEASE_ID is not set."
   fi
 
   if [ ! -z "${ASSET_PATH}" ] && [ -d "${ASSET_PATH}" ]; then
@@ -210,13 +214,11 @@ END
 
 _slack_pre() {
   if [ -z "${SLACK_TOKEN}" ]; then
-    echo "SLACK_TOKEN is not set."
-    exit 1
+    _error "SLACK_TOKEN is not set."
   fi
 
   if [ -z "${JSON_PATH}" ] || [ ! -f "${JSON_PATH}" ]; then
-    echo "JSON_PATH is not set."
-    exit 1
+    _error "JSON_PATH is not set."
   fi
 }
 
