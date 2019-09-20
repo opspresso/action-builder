@@ -9,7 +9,12 @@ fi
 echo "[${CMD}] start..."
 
 _prepare() {
-  mkdir -p target
+  # mkdir -p target
+
+  if [ ! -d ./target ]; then
+    echo "./target is not directory."
+    exit 1
+  fi
 }
 
 _version() {
@@ -39,18 +44,18 @@ _version() {
         echo "VERSION: ${VERSION}"
 
         # new version
-        if [ "${BRANCH}" == "refs/heads/master" ]; then
+        if [ "${GITHUB_REF}" == "refs/heads/master" ]; then
             VERSION=$(echo ${VERSION} | perl -pe 's/^(([v\d]+\.)*)(\d+)(.*)$/$1.($3+1).$4/e')
         else
-            if [ "${BRANCH}" != "" ]; then
+            if [ "${GITHUB_REF}" != "" ]; then
                 # refs/pull/1/merge
-                PR_CMD=$(echo "${BRANCH}" | cut -d'/' -f2)
-                PR_NUM=$(echo "${BRANCH}" | cut -d'/' -f3)
+                PR_CMD=$(echo "${GITHUB_REF}" | cut -d'/' -f2)
+                PR_NUM=$(echo "${GITHUB_REF}" | cut -d'/' -f3)
             fi
 
             if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
                 VERSION="${VERSION}-${PR_NUM}"
-                echo ${PR_NUM} > ./target/PR
+                # printf "${PR_NUM}" > ./target/PR
             else
                 VERSION=""
             fi
