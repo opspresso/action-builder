@@ -2,9 +2,11 @@
 
 set -e
 
-AERGS=$*
+# AERGS=$*
 
-CMD=$(echo "${AERGS}" | xargs | awk '{print $2}')
+# CMD=$(echo "${AERGS}" | xargs | awk '{print $2}')
+
+CMD=$2
 
 if [ -z "${CMD}" ]; then
   exit 0
