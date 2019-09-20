@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-set -e
+# set -e
 
-CMD=$1
+CMD="$1"
 
 if [ -z "${CMD}" ]; then
   exit 0
