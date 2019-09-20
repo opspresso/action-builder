@@ -6,7 +6,7 @@ if [ -z "${CMD}" ]; then
   exit 0
 fi
 
-echo "[${CMD}] start..."
+echo "[${CMD:2}] start..."
 
 _error() {
   echo -e "$1"
@@ -90,28 +90,17 @@ _commit_pre() {
 _commit() {
   _commit_pre
 
-  # git init
-
   git config --global user.name "${GIT_USERNAME}"
   git config --global user.email "${GIT_USEREMAIL}"
 
-  # git branch -a -v
-  # git remote
-
   echo "git checkout ${GIT_BRANCH}"
   git checkout ${GIT_BRANCH}
-
-  # echo "git pull origin ${GIT_BRANCH}"
-  # git pull origin ${GIT_BRANCH}
 
   echo "git add --all"
   git add --all
 
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
-
-  # git branch -a -v
-  # git remote
 
   HEADER=$(echo -n "${GITHUB_ACTOR}:${GITHUB_TOKEN}" | base64)
 
