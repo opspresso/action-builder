@@ -99,7 +99,7 @@ _commit() {
   git add --all
 
   echo "git commit -m ${MESSAGE}"
-  git commit -a --allow-empty-message -m "${MESSAGE}"
+  git commit -m "${MESSAGE}"
 
   echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
