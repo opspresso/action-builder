@@ -5,7 +5,7 @@ set -e
 ARGS=$*
 echo $ARGS
 
-# CMD=${ARR[1]}
+CMD=$(echo "$*" | awk '{print $2}')
 
 if [ -z "${CMD}" ]; then
   exit 0
