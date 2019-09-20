@@ -9,34 +9,74 @@ if [ -z "${CMD}" ]; then
   exit 1
 fi
 
-if [ -z "${GITHUB_TOKEN}" ]; then
-  echo "GITHUB_TOKEN is not set."
-  exit 1
-fi
-
-if [ -z "${TAG_NAME}" ]; then
-  if [ -f ./target/TAG_NAME ]; then
-    TAG_NAME=$(cat ./target/TAG_NAME | xargs)
-  elif [ -f ./target/VERSION ]; then
-    TAG_NAME=$(cat ./target/VERSION | xargs)
-  fi
-  if [ -z "${TAG_NAME}" ]; then
-    echo "TAG_NAME is not set."
+_publish_pre() {
+  if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
+    echo "AWS_ACCESS_KEY_ID is not set."
     exit 1
   fi
-fi
 
-if [ -z "${TARGET_COMMITISH}" ]; then
-  TARGET_COMMITISH="master"
-fi
+  if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
+    echo "AWS_SECRET_ACCESS_KEY is not set."
+    exit 1
+  fi
 
-if [ -z "${DRAFT}" ]; then
-  DRAFT="false"
-fi
+  if [ -z "${AWS_REGION}" ]; then
+    AWS_REGION="us-east-1"
+  fi
 
-if [ -z "${PRERELEASE}" ]; then
-  PRERELEASE="false"
-fi
+  if [ -z "${DEST_PATH}" ]; then
+    echo "DEST_PATH is not set."
+    exit 1
+  fi
+
+  if [ -z "${FROM_PATH}" ]; then
+    FROM_PATH="."
+  fi
+}
+
+_publish() {
+  _publish_pre
+
+  aws configure <<-EOF > /dev/null 2>&1
+${AWS_ACCESS_KEY_ID}
+${AWS_SECRET_ACCESS_KEY}
+${AWS_REGION}
+text
+EOF
+
+  aws s3 sync ${FROM_PATH} ${DEST_PATH} $*
+}
+
+_release_pre() {
+  if [ -z "${GITHUB_TOKEN}" ]; then
+    echo "GITHUB_TOKEN is not set."
+    exit 1
+  fi
+
+  if [ -z "${TAG_NAME}" ]; then
+    if [ -f ./target/TAG_NAME ]; then
+      TAG_NAME=$(cat ./target/TAG_NAME | xargs)
+    elif [ -f ./target/VERSION ]; then
+      TAG_NAME=$(cat ./target/VERSION | xargs)
+    fi
+    if [ -z "${TAG_NAME}" ]; then
+      echo "TAG_NAME is not set."
+      exit 1
+    fi
+  fi
+
+  if [ -z "${TARGET_COMMITISH}" ]; then
+    TARGET_COMMITISH="master"
+  fi
+
+  if [ -z "${DRAFT}" ]; then
+    DRAFT="false"
+  fi
+
+  if [ -z "${PRERELEASE}" ]; then
+    PRERELEASE="false"
+  fi
+}
 
 _release_id() {
     URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
@@ -70,6 +110,8 @@ _release_assets() {
 }
 
 _release() {
+    _release_pre
+
     AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
     _release_id
@@ -114,4 +156,44 @@ END
     fi
 }
 
-_release
+_slack_pre() {
+  if [ -z "${SLACK_TOKEN}" ]; then
+    echo "SLACK_TOKEN is not set."
+    exit 1
+  fi
+
+  if [ -z "${JSON_PATH}" ] || [ ! -f "${JSON_PATH}" ]; then
+    echo "JSON_PATH is not set."
+    exit 1
+  fi
+}
+
+_slack() {
+  _slack_pre
+
+  URL="https://hooks.slack.com/services/${SLACK_TOKEN}"
+  curl \
+      -sSL \
+      -X POST \
+      -H "Content-type: application/json" \
+      --data @"${JSON_PATH}" \
+      ${URL}
+}
+
+case ${CMD} in
+    build)
+        _build
+        ;;
+    publish)
+        _publish
+        ;;
+    release)
+        _release
+        ;;
+    docker)
+        _docker
+        ;;
+    slack)
+        _slack
+        ;;
+esac
