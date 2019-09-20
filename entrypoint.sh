@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# set -e
-
 CMD="$1"
 
 if [ -z "${CMD}" ]; then
