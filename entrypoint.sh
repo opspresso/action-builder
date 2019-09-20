@@ -1,6 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
-CMD=${1}
+set -e
+
+ARR=($*)
+CMD=${ARR[1]}
+
+echo $ARR
 
 if [ -z "${CMD}" ]; then
   exit 0
