@@ -2,10 +2,10 @@
 
 set -e
 
-ARR=($*)
-CMD=${ARR[1]}
+ARGS=$*
+echo $ARGS
 
-echo $ARR
+# CMD=${ARR[1]}
 
 if [ -z "${CMD}" ]; then
   exit 0
