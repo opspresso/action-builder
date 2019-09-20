@@ -90,7 +90,7 @@ _commit_pre() {
 _commit() {
   _commit_pre
 
-  git init
+  # git init
 
   git config --global user.name "${GIT_USERNAME}"
   git config --global user.email "${GIT_USEREMAIL}"
@@ -102,6 +102,8 @@ _commit() {
 
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
+
+  git branch -a -v
 
   echo "git push origin ${GIT_BRANCH}"
   git push origin ${GIT_BRANCH}
