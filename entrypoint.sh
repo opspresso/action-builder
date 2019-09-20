@@ -5,8 +5,7 @@ set -e
 CMD=${1}
 
 if [ -z "${CMD}" ]; then
-  echo "CMD is not set."
-  exit 1
+  exit 0
 fi
 
 _publish_pre() {
