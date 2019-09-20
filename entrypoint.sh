@@ -104,10 +104,10 @@ _commit() {
   git commit -a --allow-empty-message -m "${MESSAGE}"
 
   echo "git remote add origin github.com/${GITHUB_REPOSITORY}"
-  git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+  git remote add origin https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
-  echo "git push origin ${GIT_BRANCH}"
-  git push origin ${GIT_BRANCH}
+  echo "git push -u origin ${GIT_BRANCH}"
+  git push -u origin ${GIT_BRANCH}
 
   # echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   # git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
