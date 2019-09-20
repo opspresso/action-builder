@@ -113,7 +113,7 @@ _commit() {
   # git branch -a -v
   # git remote
 
-  HEADER=$(echo -n "${GITHUB_TOKEN}" | base64)
+  HEADER=$(echo -n "${GITHUB_ACTOR}:${GITHUB_TOKEN}" | base64)
 
   echo "git push -u origin ${GIT_BRANCH}"
   git -c http.extraheader="AUTHORIZATION: basic ${HEADER}" push -u origin ${GIT_BRANCH}
