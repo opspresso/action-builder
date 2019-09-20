@@ -98,11 +98,8 @@ _commit() {
   # git branch -a -v
   # git remote
 
-  # echo "git remote add opspresso github.com/${GITHUB_REPOSITORY}"
-  # git remote add opspresso https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-
-  # echo "git checkout ${GIT_BRANCH}"
-  # git checkout ${GIT_BRANCH}
+  echo "git checkout ${GIT_BRANCH}"
+  git checkout ${GIT_BRANCH}
 
   # echo "git pull origin ${GIT_BRANCH}"
   # git pull origin ${GIT_BRANCH}
@@ -115,9 +112,6 @@ _commit() {
 
   # git branch -a -v
   # git remote
-
-  # echo "git push -u opspresso ${GIT_BRANCH}"
-  # git push -u opspresso ${GIT_BRANCH}
 
   HEADER=$(echo -n "${GITHUB_TOKEN}" | base64)
 
