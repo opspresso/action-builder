@@ -8,15 +8,6 @@ fi
 
 echo "[${CMD}] start..."
 
-_prepare() {
-  # mkdir -p target
-
-  if [ ! -d ./target ]; then
-    echo "./target is not directory."
-    exit 1
-  fi
-}
-
 _version() {
     if [ ! -f ./VERSION ]; then
         printf "v0.0.x" > ./VERSION
@@ -31,7 +22,7 @@ _version() {
 
     if [ "${PATCH}" != "x" ]; then
         VERSION="${MAJOR}.${MINOR}.${PATCH}"
-        printf "${VERSION}" > ./target/VERSION
+        printf "${VERSION}" > ./VERSION
     else
         # latest versions
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
@@ -55,14 +46,13 @@ _version() {
 
             if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
                 VERSION="${VERSION}-${PR_NUM}"
-                # printf "${PR_NUM}" > ./target/PR
             else
                 VERSION=""
             fi
         fi
 
         if [ "${VERSION}" != "" ]; then
-            printf "${VERSION}" > ./target/VERSION
+            printf "${VERSION}" > ./VERSION
         fi
     fi
 
@@ -241,8 +231,6 @@ _slack() {
     --data @"${JSON_PATH}" \
     ${URL}
 }
-
-_prepare
 
 case "${CMD}" in
   --version|version)
