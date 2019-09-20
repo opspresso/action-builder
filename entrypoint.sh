@@ -90,6 +90,8 @@ _commit_pre() {
 _commit() {
   _commit_pre
 
+  git init
+
   git config --global user.name "${GIT_USERNAME}"
   git config --global user.email "${GIT_USEREMAIL}"
 
