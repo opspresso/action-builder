@@ -82,9 +82,9 @@ _commit_pre() {
     GIT_USEREMAIL="bot@nalbam.com"
   fi
 
-  if [ -z "${GIT_BRANCH}" ]; then
-    GIT_BRANCH="master"
-  fi
+  # if [ -z "${GIT_BRANCH}" ]; then
+  #   GIT_BRANCH="master"
+  # fi
 }
 
 _commit() {
@@ -98,8 +98,8 @@ _commit() {
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
 
-  echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
-  git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
+  echo "git push github.com/${GITHUB_REPOSITORY} ${GITHUB_REF}"
+  git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GITHUB_REF}
 }
 
 _publish_pre() {
