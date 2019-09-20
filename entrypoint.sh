@@ -5,11 +5,12 @@ set -e
 AERGS=$*
 
 CMD=$(echo "${AERGS}" | xargs | awk '{print $2}')
-echo "${CMD} start..."
 
 if [ -z "${CMD}" ]; then
   exit 0
 fi
+
+echo "${CMD} start..."
 
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
@@ -26,13 +27,13 @@ _publish_pre() {
     AWS_REGION="us-east-1"
   fi
 
+  if [ -z "${FROM_PATH}" ]; then
+    FROM_PATH="."
+  fi
+
   if [ -z "${DEST_PATH}" ]; then
     echo "DEST_PATH is not set."
     exit 1
-  fi
-
-  if [ -z "${FROM_PATH}" ]; then
-    FROM_PATH="."
   fi
 }
 
@@ -183,18 +184,12 @@ _slack() {
 }
 
 case "${CMD}" in
-  # build)
-  #   _build
-  #   ;;
   publish)
     _publish
     ;;
   release)
     _release
     ;;
-  # docker)
-  #   _docker
-  #   ;;
   slack)
     _slack
     ;;
