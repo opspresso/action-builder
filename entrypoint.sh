@@ -2,7 +2,9 @@
 
 set -e
 
-CMD=$(echo "$*" | awk '{print $2}')
+AERGS=$*
+
+CMD=$(echo "${AERGS}" | awk '{print $2}')
 echo "${CMD} start..."
 
 if [ -z "${CMD}" ]; then
