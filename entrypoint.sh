@@ -4,7 +4,7 @@ set -e
 
 AERGS=$*
 
-CMD=$(echo "${AERGS}" | awk '{print $2}')
+CMD=$(echo "${AERGS}" | xargs | awk '{print $2}')
 echo "${CMD} start..."
 
 if [ -z "${CMD}" ]; then
