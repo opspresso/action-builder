@@ -1,6 +1,6 @@
 FROM python:3.7-stretch
 
-LABEL "com.github.actions.name"="Action Builder"
+LABEL "com.github.actions.name"="Opspresso Builder"
 LABEL "com.github.actions.description"="GitHub Action Builder"
 LABEL "com.github.actions.icon"="box"
 LABEL "com.github.actions.color"="blue"
