@@ -94,13 +94,15 @@ _commit() {
   git config --global user.email "${GIT_USEREMAIL}"
 
   git branch
+
+  echo "git add --all"
   git add --all
 
   echo "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
 
-  echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
-  git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
+  echo "git push origin ${GIT_BRANCH}"
+  git push origin ${GIT_BRANCH}
 }
 
 _publish_pre() {
