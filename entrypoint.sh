@@ -181,22 +181,22 @@ _slack() {
     ${URL}
 }
 
-# case "${CMD}" in
-#   --publish|publish)
-#     _publish
-#     ;;
-#   --release|release)
-#     _release
-#     ;;
-#   --slack|slack)
-#     _slack
-#     ;;
-# esac
+case "${CMD}" in
+  --publish|publish)
+    _publish
+    ;;
+  --release|release)
+    _release
+    ;;
+  --slack|slack)
+    _slack
+    ;;
+esac
 
-if [ "${CMD}" == "--publish" ]; then
-  _publish
-elif [ "${CMD}" == "--release" ]; then
-  _release
-elif [ "${CMD}" == "--slack" ]; then
-  _slack
-fi
+# if [ "${CMD}" == "--publish" ]; then
+#   _publish
+# elif [ "${CMD}" == "--release" ]; then
+#   _release
+# elif [ "${CMD}" == "--slack" ]; then
+#   _slack
+# fi
