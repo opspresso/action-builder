@@ -180,18 +180,18 @@ _slack() {
 }
 
 case ${CMD} in
-    build)
-        _build
-        ;;
+    # build)
+    #     _build
+    #     ;;
     publish)
         _publish
         ;;
     release)
         _release
         ;;
-    docker)
-        _docker
-        ;;
+    # docker)
+    #     _docker
+    #     ;;
     slack)
         _slack
         ;;
