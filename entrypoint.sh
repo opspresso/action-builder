@@ -2,10 +2,6 @@
 
 set -e
 
-# AERGS=$*
-
-# CMD=$(echo "${AERGS}" | xargs | awk '{print $2}')
-
 CMD=$2
 
 if [ -z "${CMD}" ]; then
@@ -196,3 +192,5 @@ case "${CMD}" in
     _slack
     ;;
 esac
+
+exit 0
