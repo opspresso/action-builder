@@ -69,6 +69,39 @@ _version() {
   echo "VERSION: ${VERSION}"
 }
 
+_commit_pre() {
+  if [ -z "${GITHUB_TOKEN}" ]; then
+    _error "GITHUB_TOKEN is not set."
+  fi
+
+  if [ -z "${GIT_USERNAME}" ]; then
+    GIT_USERNAME="bot"
+  fi
+
+  if [ -z "${GIT_USEREMAIL}" ]; then
+    GIT_USEREMAIL="bot@nalbam.com"
+  fi
+
+  if [ -z "${GIT_BRANCH}" ]; then
+    GIT_BRANCH="master"
+  fi
+}
+
+_commit() {
+  _commit_pre
+
+  git config --global user.name "${GIT_USERNAME}"
+  git config --global user.email "${GIT_USEREMAIL}"
+
+  git add --all
+
+  echo "git commit -m ${MESSAGE}"
+  git commit -a --allow-empty-message -m "${MESSAGE}"
+
+  echo "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
+  git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
+}
+
 _publish_pre() {
   if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
     _error "AWS_ACCESS_KEY_ID is not set."
@@ -250,6 +283,9 @@ _slack() {
 case "${CMD}" in
   --version|version)
     _version
+    ;;
+  --commit|commit)
+    _commit
     ;;
   --publish|publish)
     _publish
