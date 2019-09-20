@@ -93,7 +93,7 @@ _commit() {
   git config --global user.name "${GIT_USERNAME}"
   git config --global user.email "${GIT_USEREMAIL}"
 
-  git branch --all
+  git branch -a -v
 
   echo "git add --all"
   git add --all
