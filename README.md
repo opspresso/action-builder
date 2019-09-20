@@ -1,7 +1,5 @@
 # Opspresso Builder
 
-<a href="https://github.com/opspresso/action-builder"><img alt="GitHub Actions status" src="https://github.com/opspresso/action-builder/workflows/Build-Push/badge.svg"></a>
-
 ## Usage
 
 ```yaml
