@@ -3,6 +3,7 @@
 set -e
 
 CMD=$(echo "$*" | awk '{print $2}')
+echo "${CMD} start..."
 
 if [ -z "${CMD}" ]; then
   exit 0
@@ -179,7 +180,7 @@ _slack() {
     ${URL}
 }
 
-case ${CMD} in
+case "${CMD}" in
   # build)
   #   _build
   #   ;;
