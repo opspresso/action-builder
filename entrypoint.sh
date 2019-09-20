@@ -118,6 +118,8 @@ _release_pre() {
       TAG_NAME=$(cat ./target/TAG_NAME | xargs)
     elif [ -f ./target/VERSION ]; then
       TAG_NAME=$(cat ./target/VERSION | xargs)
+    elif [ -f ./VERSION ]; then
+      TAG_NAME=$(cat ./VERSION | xargs)
     fi
     if [ -z "${TAG_NAME}" ]; then
       echo "TAG_NAME is not set."
