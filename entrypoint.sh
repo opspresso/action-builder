@@ -2,9 +2,6 @@
 
 set -e
 
-ARGS=$*
-echo $ARGS
-
 CMD=$(echo "$*" | awk '{print $2}')
 
 if [ -z "${CMD}" ]; then
