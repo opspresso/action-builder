@@ -78,61 +78,61 @@ _release_pre() {
 }
 
 _release_id() {
-    URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-    RELEASE_ID=$(curl -s ${URL} | TAG_NAME=${TAG_NAME} jq -r '.[] | select(.tag_name == env.TAG_NAME) | .id' | xargs)
-    echo "RELEASE_ID: ${RELEASE_ID}"
+  URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+  RELEASE_ID=$(curl -s ${URL} | TAG_NAME=${TAG_NAME} jq -r '.[] | select(.tag_name == env.TAG_NAME) | .id' | xargs)
+  echo "RELEASE_ID: ${RELEASE_ID}"
 }
 
 _release_assets() {
-    LIST=/tmp/release-list
-    ls ${ASSET_PATH} | sort > ${LIST}
+  LIST=/tmp/release-list
+  ls ${ASSET_PATH} | sort > ${LIST}
 
-    while read FILENAME; do
-        FILEPATH=${ASSET_PATH}/${FILENAME}
-        FILETYPE=$(file -b --mime-type "${FILEPATH}")
-        FILESIZE=$(stat -c%s "${FILEPATH}")
+  while read FILENAME; do
+    FILEPATH=${ASSET_PATH}/${FILENAME}
+    FILETYPE=$(file -b --mime-type "${FILEPATH}")
+    FILESIZE=$(stat -c%s "${FILEPATH}")
 
-        CONTENT_TYPE_HEADER="Content-Type: ${FILETYPE}"
-        CONTENT_LENGTH_HEADER="Content-Length: ${FILESIZE}"
+    CONTENT_TYPE_HEADER="Content-Type: ${FILETYPE}"
+    CONTENT_LENGTH_HEADER="Content-Length: ${FILESIZE}"
 
-        echo "github releases assets ${RELEASE_ID} ${FILENAME} ${FILETYPE} ${FILESIZE}"
-        URL="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${FILENAME}"
-        curl \
-            -sSL \
-            -X POST \
-            -H "${AUTH_HEADER}" \
-            -H "${CONTENT_TYPE_HEADER}" \
-            -H "${CONTENT_LENGTH_HEADER}" \
-            --data-binary @${FILEPATH} \
-            ${URL}
-    done < ${LIST}
+    echo "github releases assets ${RELEASE_ID} ${FILENAME} ${FILETYPE} ${FILESIZE}"
+    URL="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${FILENAME}"
+    curl \
+      -sSL \
+      -X POST \
+      -H "${AUTH_HEADER}" \
+      -H "${CONTENT_TYPE_HEADER}" \
+      -H "${CONTENT_LENGTH_HEADER}" \
+      --data-binary @${FILEPATH} \
+      ${URL}
+  done < ${LIST}
 }
 
 _release() {
-    _release_pre
+  _release_pre
 
-    AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-    _release_id
-    if [ ! -z "${RELEASE_ID}" ]; then
-        echo "github releases delete ${RELEASE_ID}"
-        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}"
-        curl \
-            -sSL \
-            -X DELETE \
-            -H "${AUTH_HEADER}" \
-            ${URL}
-        sleep 1
-    fi
-
-    echo "github releases create ${TAG_NAME} ${DRAFT} ${PRERELEASE}"
-    URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+  _release_id
+  if [ ! -z "${RELEASE_ID}" ]; then
+    echo "github releases delete ${RELEASE_ID}"
+    URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}"
     curl \
-        -sSL \
-        -X POST \
-        -H "${AUTH_HEADER}" \
-        --data @- \
-        ${URL} <<END
+      -sSL \
+      -X DELETE \
+      -H "${AUTH_HEADER}" \
+      ${URL}
+    sleep 1
+  fi
+
+  echo "github releases create ${TAG_NAME} ${DRAFT} ${PRERELEASE}"
+  URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+  curl \
+    -sSL \
+    -X POST \
+    -H "${AUTH_HEADER}" \
+    --data @- \
+    ${URL} <<END
 {
  "tag_name": "${TAG_NAME}",
  "target_commitish": "${TARGET_COMMITISH}",
@@ -142,17 +142,17 @@ _release() {
  "prerelease": ${PRERELEASE}
 }
 END
-    sleep 1
+  sleep 1
 
-    _release_id
-    if [ -z "${RELEASE_ID}" ]; then
-        echo "RELEASE_ID is not set."
-        exit 1
-    fi
+  _release_id
+  if [ -z "${RELEASE_ID}" ]; then
+    echo "RELEASE_ID is not set."
+    exit 1
+  fi
 
-    if [ ! -z "${ASSET_PATH}" ] && [ -d "${ASSET_PATH}" ]; then
-        _release_assets
-    fi
+  if [ ! -z "${ASSET_PATH}" ] && [ -d "${ASSET_PATH}" ]; then
+    _release_assets
+  fi
 }
 
 _slack_pre() {
@@ -172,27 +172,27 @@ _slack() {
 
   URL="https://hooks.slack.com/services/${SLACK_TOKEN}"
   curl \
-      -sSL \
-      -X POST \
-      -H "Content-type: application/json" \
-      --data @"${JSON_PATH}" \
-      ${URL}
+    -sSL \
+    -X POST \
+    -H "Content-type: application/json" \
+    --data @"${JSON_PATH}" \
+    ${URL}
 }
 
 case ${CMD} in
-    # build)
-    #     _build
-    #     ;;
-    publish)
-        _publish
-        ;;
-    release)
-        _release
-        ;;
-    # docker)
-    #     _docker
-    #     ;;
-    slack)
-        _slack
-        ;;
+  # build)
+  #   _build
+  #   ;;
+  publish)
+    _publish
+    ;;
+  release)
+    _release
+    ;;
+  # docker)
+  #   _docker
+  #   ;;
+  slack)
+    _slack
+    ;;
 esac
