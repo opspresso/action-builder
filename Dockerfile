@@ -11,7 +11,7 @@ LABEL repository="https://github.com/opspresso/action-builder"
 LABEL maintainer="Jungyoul Yu <me@nalbam.com>"
 LABEL homepage="https://opspresso.com/"
 
-# RUN apk -v --update add bash curl python py-pip jq
+# RUN apk -v --update add bash curl python py-pip jq git
 
 # RUN pip install --upgrade awscli python-magic && \
 #     apk -v --purge del py-pip && \
