@@ -273,6 +273,69 @@ END
   fi
 }
 
+_ecr_pre() {
+  if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
+    _error "AWS_ACCESS_KEY_ID is not set."
+  fi
+
+  if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
+    _error "AWS_SECRET_ACCESS_KEY is not set."
+  fi
+
+  if [ -z "${AWS_REGION}" ]; then
+    AWS_REGION="us-east-1"
+  fi
+
+  if [ -z "${AWS_ACCOUNT_ID}" ]; then
+    AWS_ACCOUNT_ID="$(aws sts get-caller-identity | grep "Account" | cut -d'"' -f4)"
+  fi
+
+  if [ -z "${IMAGE_NAME}" ]; then
+    IMAGE_NAME="${GITHUB_REPOSITORY}"
+  fi
+
+  if [ -z "${IMAGE_URI}" ]; then
+    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
+  fi
+
+  if [ -z "${TAG_NAME}" ]; then
+    if [ -f ./target/TAG_NAME ]; then
+      TAG_NAME=$(cat ./target/TAG_NAME | xargs)
+    elif [ -f ./target/VERSION ]; then
+      TAG_NAME=$(cat ./target/VERSION | xargs)
+    elif [ -f ./VERSION ]; then
+      TAG_NAME=$(cat ./VERSION | xargs)
+    fi
+    if [ -z "${TAG_NAME}" ]; then
+      _error "TAG_NAME is not set."
+    fi
+  fi
+}
+
+_ecr() {
+  _ecr_pre
+
+  echo "aws ecr get-login --no-include-email"
+  echo aws ecr get-login --no-include-email
+
+  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
+  docker build -t ${IMAGE_URI}:${TAG_NAME} .
+
+  echo "docker push ${IMAGE_URI}:${TAG_NAME}"
+  docker push ${IMAGE_URI}:${TAG_NAME}
+
+  if [ "${LATEST}" == "true" ]; then
+    echo "docker tag ${IMAGE_URI}:latest"
+    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
+
+    echo "docker push ${IMAGE_URI}:latest"
+    docker push ${IMAGE_URI}:latest
+  fi
+
+  echo "docker logout"
+  docker logout
+}
+
 _docker_pre() {
   if [ -z "${USERNAME}" ]; then
     _error "USERNAME is not set."
