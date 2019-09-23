@@ -309,6 +309,13 @@ _ecr_pre() {
 _ecr() {
   _ecr_pre
 
+  aws configure <<-EOF > /dev/null 2>&1
+${AWS_ACCESS_KEY_ID}
+${AWS_SECRET_ACCESS_KEY}
+${AWS_REGION}
+text
+EOF
+
   echo "aws ecr get-login --no-include-email"
   echo aws ecr get-login --no-include-email
 
