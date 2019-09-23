@@ -11,7 +11,7 @@ echo "[${CMD:2}] start..."
 _error() {
   echo -e "$1"
 
-  if [ ! -z "${LOOSE_ERROR}" ]; then
+  if [ "${LOOSE_ERROR}" == "true" ]; then
     exit 0
   else
     exit 1
@@ -187,11 +187,11 @@ _release_pre() {
     TARGET_COMMITISH="master"
   fi
 
-  if [ -z "${DRAFT}" ]; then
+  if [ "${DRAFT}" != "true" ]; then
     DRAFT="false"
   fi
 
-  if [ -z "${PRERELEASE}" ]; then
+  if [ "${PRERELEASE}" != "true" ]; then
     PRERELEASE="false"
   fi
 }
@@ -283,7 +283,6 @@ _docker_pre() {
   fi
 
   if [ -z "${IMAGE_NAME}" ]; then
-    # _error "IMAGE_NAME is not set."
     IMAGE_NAME="${GITHUB_REPOSITORY}"
   fi
 
@@ -313,7 +312,7 @@ _docker() {
   echo "docker push ${IMAGE_NAME}:${TAG_NAME}"
   docker push ${IMAGE_NAME}:${TAG_NAME}
 
-  if [ ! -z "${LATEST}" ]; then
+  if [ "${LATEST}" == "true" ]; then
     echo "docker tag ${IMAGE_NAME}:latest"
     docker tag ${IMAGE_NAME}:${TAG_NAME} ${IMAGE_NAME}:latest
 
