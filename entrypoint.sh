@@ -317,7 +317,7 @@ text
 EOF
 
   echo "aws ecr get-login --no-include-email"
-  aws ecr get-login --no-include-email
+  aws ecr get-login --no-include-email | sh
 
   echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
   docker build -t ${IMAGE_URI}:${TAG_NAME} .
