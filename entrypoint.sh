@@ -2,12 +2,6 @@
 
 CMD="$1"
 
-if [ -z "${CMD}" ]; then
-  exit 0
-fi
-
-echo "[${CMD:2}] start..."
-
 _error() {
   echo -e "$1"
 
@@ -409,23 +403,34 @@ _slack() {
     ${URL}
 }
 
-case "${CMD}" in
-  --version|version)
+if [ -z "${CMD}" ]; then
+  _error
+fi
+
+echo "[${CMD:2}] start..."
+
+case "${CMD:2}" in
+  version)
     _version
     ;;
-  --commit|commit)
+  commit)
     _commit
     ;;
-  --publish|publish)
+  publish)
     _publish
     ;;
-  --release|release)
+  release)
     _release
     ;;
-  --docker|docker)
+  docker)
     _docker
     ;;
-  --slack|slack)
+  ecr)
+    _ecr
+    ;;
+  slack)
     _slack
     ;;
+  *)
+    _error
 esac
