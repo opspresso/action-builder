@@ -46,7 +46,7 @@ _version() {
 
     # new version
     if [ "${GITHUB_REF}" == "refs/heads/master" ]; then
-      VERSION=$(echo ${VERSION} | perl -pe 's/^(([v\d]+\.)*)(\d+)(.*)$/$1.($3+1).$4/e')
+      VERSION=$(echo ${VERSION} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
     else
       if [ "${GITHUB_REF}" != "" ]; then
         # refs/pull/1/merge

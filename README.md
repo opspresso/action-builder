@@ -49,15 +49,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: "v0.0.1"
 
-      - name: Build & Push to Docker Hub
-        uses: opspresso/action-docker@master
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          IMAGE_NAME: "user_id/image_name"
-          TAG_NAME: "v0.0.1"
-          LATEST: "true"
-
       - name: Post to Slack
         uses: opspresso/action-builder@master
         with:
