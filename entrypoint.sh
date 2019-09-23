@@ -317,7 +317,7 @@ text
 EOF
 
   echo "aws ecr get-login --no-include-email"
-  echo aws ecr get-login --no-include-email
+  aws ecr get-login --no-include-email
 
   echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
   docker build -t ${IMAGE_URI}:${TAG_NAME} .
@@ -333,8 +333,8 @@ EOF
     docker push ${IMAGE_URI}:latest
   fi
 
-  echo "docker logout"
-  docker logout
+  # echo "docker logout"
+  # docker logout
 }
 
 _docker_pre() {
