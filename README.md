@@ -77,3 +77,9 @@ jobs:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           JSON_PATH: ./target/slack_message.json
 ```
+
+## More details
+
+* <https://github.com/marketplace/actions/aws-s3-sync>
+* <https://github.com/marketplace/actions/release-to-github>
+* <https://github.com/marketplace/actions/docker-push>
