@@ -24,14 +24,6 @@ _aws_pre() {
   if [ -z "${AWS_REGION}" ]; then
     AWS_REGION="us-east-1"
   fi
-
-#   # aws credentials
-#   aws configure <<-EOF > /dev/null 2>&1
-# ${AWS_ACCESS_KEY_ID}
-# ${AWS_SECRET_ACCESS_KEY}
-# ${AWS_REGION}
-# text
-# EOF
 }
 
 _version() {
@@ -147,6 +139,14 @@ _publish_pre() {
 
 _publish() {
   _publish_pre
+
+  # aws credentials
+  aws configure <<-EOF > /dev/null 2>&1
+${AWS_ACCESS_KEY_ID}
+${AWS_SECRET_ACCESS_KEY}
+${AWS_REGION}
+text
+EOF
 
   # aws s3 sync
   echo "aws s3 sync ${FROM_PATH} ${DEST_PATH}"
@@ -303,6 +303,14 @@ _ecr_pre() {
 
 _ecr() {
   _ecr_pre
+
+  # aws credentials
+  aws configure <<-EOF > /dev/null 2>&1
+${AWS_ACCESS_KEY_ID}
+${AWS_SECRET_ACCESS_KEY}
+${AWS_REGION}
+text
+EOF
 
   echo "aws ecr get-login --no-include-email"
   aws ecr get-login --no-include-email | sh
