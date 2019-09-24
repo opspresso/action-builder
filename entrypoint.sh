@@ -299,6 +299,10 @@ _ecr_pre() {
       _error "TAG_NAME is not set."
     fi
   fi
+
+  if [ "${IMAGE_TAG_MUTABILITY}" != "MUTABLE" ]; then
+    IMAGE_TAG_MUTABILITY="IMMUTABLE"
+  fi
 }
 
 _ecr() {
@@ -314,6 +318,12 @@ EOF
 
   echo "aws ecr get-login --no-include-email"
   aws ecr get-login --no-include-email | sh
+
+  COUNT=$(aws ecr describe-repositories | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
+  if [ "x${COUNT}" == "x0" ]; then
+    echo "aws ecr create-repository ${IMAGE_NAME}"
+    aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
+  fi
 
   echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
   docker build -t ${IMAGE_URI}:${TAG_NAME} .
