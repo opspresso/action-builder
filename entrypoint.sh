@@ -25,13 +25,13 @@ _aws_pre() {
     AWS_REGION="us-east-1"
   fi
 
-  # aws credentials
-  aws configure <<-EOF > /dev/null 2>&1
-${AWS_ACCESS_KEY_ID}
-${AWS_SECRET_ACCESS_KEY}
-${AWS_REGION}
-text
-EOF
+#   # aws credentials
+#   aws configure <<-EOF > /dev/null 2>&1
+# ${AWS_ACCESS_KEY_ID}
+# ${AWS_SECRET_ACCESS_KEY}
+# ${AWS_REGION}
+# text
+# EOF
 }
 
 _version() {
