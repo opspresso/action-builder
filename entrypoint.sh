@@ -300,8 +300,8 @@ _ecr_pre() {
     fi
   fi
 
-  if [ "${IMAGE_TAG_MUTABILITY}" != "MUTABLE" ]; then
-    IMAGE_TAG_MUTABILITY="IMMUTABLE"
+  if [ "${IMAGE_TAG_MUTABILITY}" != "IMMUTABLE" ]; then
+    IMAGE_TAG_MUTABILITY="MUTABLE"
   fi
 }
 
