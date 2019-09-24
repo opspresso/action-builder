@@ -49,6 +49,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: "v0.0.1"
 
+      - name: Build & Push to Docker Hub
+        uses: opspresso/action-docker@master
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          IMAGE_NAME: "user_id/image_name"
+          TAG_NAME: "v0.0.1"
+          LATEST: "true"
+
+      - name: Build & Push to AWS ECR
+        uses: opspresso/action-docker@master
+        with:
+          args: --ecr
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          IMAGE_URI: "xxxx.dkr.ecr.us-east-1.amazonaws.com/image_name"
+          TAG_NAME: "v0.0.1"
+          LATEST: "true"
+
       - name: Post to Slack
         uses: opspresso/action-builder@master
         with:
