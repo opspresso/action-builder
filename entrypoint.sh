@@ -163,7 +163,7 @@ EOF
     BUCKET="$(echo "${DEST_PATH}" | cut -d'/' -f3)"
 
     # aws cf reset
-    CFID=$(aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Origin:Origins.Items[0].DomainName}[?contains(Origin,'${BUCKET}')] | [0]" | grep 'Id' | cut -d'"' -f4)
+    CFID=$(aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Origin:Origins.Items[0].DomainName}[?contains(Origin,'${BUCKET}')] | [0]" | awk '{print $1}')
     if [ "${CFID}" != "" ]; then
         echo "aws cloudfront create-invalidation ${CFID}"
         aws cloudfront create-invalidation --distribution-id ${CFID} --paths "/*"
