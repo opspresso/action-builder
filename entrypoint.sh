@@ -2,6 +2,11 @@
 
 CMD="$1"
 
+REPOSITORY=${GITHUB_REPOSITORY}
+
+USERNAME=${USERNAME:-$GITHUB_ACTOR}
+REPONAME=$(echo "${REPOSITORY}" | cut -d'/' -f2)
+
 _error() {
   echo -e "$1"
 
@@ -133,7 +138,8 @@ _publish_pre() {
   fi
 
   if [ -z "${DEST_PATH}" ]; then
-    _error "DEST_PATH is not set."
+    # _error "DEST_PATH is not set."
+    REPONAME="s3://${REPONAME}"
   fi
 }
 
