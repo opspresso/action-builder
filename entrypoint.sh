@@ -272,7 +272,71 @@ END
   fi
 }
 
-_ecr_pre() {
+_docker_tag() {
+  if [ -z "${TAG_NAME}" ]; then
+    if [ -f ./target/TAG_NAME ]; then
+      TAG_NAME=$(cat ./target/TAG_NAME | xargs)
+    elif [ -f ./target/VERSION ]; then
+      TAG_NAME=$(cat ./target/VERSION | xargs)
+    elif [ -f ./VERSION ]; then
+      TAG_NAME=$(cat ./VERSION | xargs)
+    fi
+    if [ -z "${TAG_NAME}" ]; then
+      _error "TAG_NAME is not set."
+    fi
+  fi
+}
+
+_docker_push() {
+  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
+  docker build -t ${IMAGE_URI}:${TAG_NAME} .
+
+  echo "docker push ${IMAGE_URI}:${TAG_NAME}"
+  docker push ${IMAGE_URI}:${TAG_NAME}
+
+  if [ "${LATEST}" == "true" ]; then
+    echo "docker tag ${IMAGE_URI}:latest"
+    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
+
+    echo "docker push ${IMAGE_URI}:latest"
+    docker push ${IMAGE_URI}:latest
+  fi
+}
+
+_docker_pre() {
+  if [ -z "${USERNAME}" ]; then
+    _error "USERNAME is not set."
+  fi
+
+  if [ -z "${PASSWORD}" ]; then
+    _error "PASSWORD is not set."
+  fi
+
+  if [ -z "${IMAGE_NAME}" ]; then
+    IMAGE_NAME="${GITHUB_REPOSITORY}"
+  fi
+
+  if [ -z "${IMAGE_URI}" ]; then
+    if [ -z "${RESISTRY}" ]; then
+      IMAGE_URI="${IMAGE_NAME}"
+    else
+      IMAGE_URI="${RESISTRY}/${IMAGE_NAME}"
+    fi
+  fi
+
+  _docker_tag
+}
+
+_docker() {
+  _docker_pre
+
+  echo "docker login ${REGISTRY} -u ${USERNAME}"
+  echo ${PASSWORD} | docker login ${REGISTRY} -u ${USERNAME} --password-stdin
+
+  _docker_push
+}
+
+_docker_ecr_pre() {
   _aws_pre
 
   if [ -z "${AWS_ACCOUNT_ID}" ]; then
@@ -287,26 +351,15 @@ _ecr_pre() {
     IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
   fi
 
-  if [ -z "${TAG_NAME}" ]; then
-    if [ -f ./target/TAG_NAME ]; then
-      TAG_NAME=$(cat ./target/TAG_NAME | xargs)
-    elif [ -f ./target/VERSION ]; then
-      TAG_NAME=$(cat ./target/VERSION | xargs)
-    elif [ -f ./VERSION ]; then
-      TAG_NAME=$(cat ./VERSION | xargs)
-    fi
-    if [ -z "${TAG_NAME}" ]; then
-      _error "TAG_NAME is not set."
-    fi
-  fi
+  _docker_tag
 
   if [ "${IMAGE_TAG_MUTABILITY}" != "IMMUTABLE" ]; then
     IMAGE_TAG_MUTABILITY="MUTABLE"
   fi
 }
 
-_ecr() {
-  _ecr_pre
+_docker_ecr() {
+  _docker_ecr_pre
 
   # aws credentials
   aws configure <<-EOF > /dev/null 2>&1
@@ -325,73 +378,7 @@ EOF
     aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
   fi
 
-  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
-  docker build -t ${IMAGE_URI}:${TAG_NAME} .
-
-  echo "docker push ${IMAGE_URI}:${TAG_NAME}"
-  docker push ${IMAGE_URI}:${TAG_NAME}
-
-  if [ "${LATEST}" == "true" ]; then
-    echo "docker tag ${IMAGE_URI}:latest"
-    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
-
-    echo "docker push ${IMAGE_URI}:latest"
-    docker push ${IMAGE_URI}:latest
-  fi
-
-  # echo "docker logout"
-  # docker logout
-}
-
-_docker_pre() {
-  if [ -z "${USERNAME}" ]; then
-    _error "USERNAME is not set."
-  fi
-
-  if [ -z "${PASSWORD}" ]; then
-    _error "PASSWORD is not set."
-  fi
-
-  if [ -z "${IMAGE_NAME}" ]; then
-    IMAGE_NAME="${GITHUB_REPOSITORY}"
-  fi
-
-  if [ -z "${TAG_NAME}" ]; then
-    if [ -f ./target/TAG_NAME ]; then
-      TAG_NAME=$(cat ./target/TAG_NAME | xargs)
-    elif [ -f ./target/VERSION ]; then
-      TAG_NAME=$(cat ./target/VERSION | xargs)
-    elif [ -f ./VERSION ]; then
-      TAG_NAME=$(cat ./VERSION | xargs)
-    fi
-    if [ -z "${TAG_NAME}" ]; then
-      _error "TAG_NAME is not set."
-    fi
-  fi
-}
-
-_docker() {
-  _docker_pre
-
-  echo "docker login -u ${USERNAME}"
-  echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
-
-  echo "docker build -t ${IMAGE_NAME}:${TAG_NAME} ."
-  docker build -t ${IMAGE_NAME}:${TAG_NAME} .
-
-  echo "docker push ${IMAGE_NAME}:${TAG_NAME}"
-  docker push ${IMAGE_NAME}:${TAG_NAME}
-
-  if [ "${LATEST}" == "true" ]; then
-    echo "docker tag ${IMAGE_NAME}:latest"
-    docker tag ${IMAGE_NAME}:${TAG_NAME} ${IMAGE_NAME}:latest
-
-    echo "docker push ${IMAGE_NAME}:latest"
-    docker push ${IMAGE_NAME}:latest
-  fi
-
-  echo "docker logout"
-  docker logout
+  _docker_push
 }
 
 _slack_pre() {
@@ -439,7 +426,7 @@ case "${CMD:2}" in
     _docker
     ;;
   ecr)
-    _ecr
+    _docker_ecr
     ;;
   slack)
     _slack
