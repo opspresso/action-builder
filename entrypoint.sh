@@ -312,7 +312,7 @@ _docker_push() {
   docker push ${IMAGE_URI_TAG}
 
   if [ "${LATEST}" == "true" ]; then
-    IMAGE_URI_LATEST="$(_docker_image_uri_tag latesst)"
+    IMAGE_URI_LATEST="$(_docker_image_uri_tag latest)"
 
     echo "docker tag ${IMAGE_URI_LATEST}"
     docker tag ${IMAGE_URI_TAG} ${IMAGE_URI_LATEST}
