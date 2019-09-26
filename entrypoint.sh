@@ -324,10 +324,10 @@ _docker_pre() {
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
-    if [ -z "${RESISTRY}" ]; then
+    if [ -z "${REGISTRY}" ]; then
       IMAGE_URI="${IMAGE_NAME}"
     else
-      IMAGE_URI="${RESISTRY}/${IMAGE_NAME}"
+      IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
     fi
   fi
 
