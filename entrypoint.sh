@@ -294,19 +294,31 @@ _docker_tag() {
   fi
 }
 
-_docker_push() {
-  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ."
-  docker build -t ${IMAGE_URI}:${TAG_NAME} .
+_docker_image_uri_tag() {
+  if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
+    return "${IMAGE_URI}/${1}"
+  else
+    return "${IMAGE_URI}:${1}"
+  fi
+}
 
-  echo "docker push ${IMAGE_URI}:${TAG_NAME}"
-  docker push ${IMAGE_URI}:${TAG_NAME}
+_docker_push() {
+  IMAGE_URI_TAG="$(_docker_image_uri_tag ${TAG_NAME})"
+
+  echo "docker build -t ${IMAGE_URI_TAG} ."
+  docker build -t ${IMAGE_URI_TAG} .
+
+  echo "docker push ${IMAGE_URI_TAG}"
+  docker push ${IMAGE_URI_TAG}
 
   if [ "${LATEST}" == "true" ]; then
-    echo "docker tag ${IMAGE_URI}:latest"
-    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
+    IMAGE_URI_LATEST="$(_docker_image_uri_tag latesst)"
 
-    echo "docker push ${IMAGE_URI}:latest"
-    docker push ${IMAGE_URI}:latest
+    echo "docker tag ${IMAGE_URI_LATEST}"
+    docker tag ${IMAGE_URI_TAG} ${IMAGE_URI_LATEST}
+
+    echo "docker push ${IMAGE_URI_LATEST}"
+    docker push ${IMAGE_URI_LATEST}
   fi
 }
 
