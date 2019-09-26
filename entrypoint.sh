@@ -341,6 +341,9 @@ _docker() {
   echo ${PASSWORD} | docker login ${REGISTRY} -u ${USERNAME} --password-stdin
 
   _docker_push
+
+  echo "docker logout"
+  docker logout
 }
 
 _docker_ecr_pre() {
