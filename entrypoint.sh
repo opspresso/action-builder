@@ -296,9 +296,9 @@ _docker_tag() {
 
 _docker_image_uri_tag() {
   if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-    return "${IMAGE_URI}/${1}"
+    printf "${IMAGE_URI}/${1}"
   else
-    return "${IMAGE_URI}:${1}"
+    printf "${IMAGE_URI}:${1}"
   fi
 }
 
