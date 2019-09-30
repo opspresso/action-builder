@@ -293,7 +293,14 @@ _deploy_pre() {
   fi
 
   if [ -z "${VERSION}" ]; then
-    _error "VERSION is not set."
+    if [ -f ./target/VERSION ]; then
+      VERSION=$(cat ./target/VERSION | xargs)
+    elif [ -f ./VERSION ]; then
+      VERSION=$(cat ./VERSION | xargs)
+    fi
+    if [ -z "${VERSION}" ]; then
+      _error "VERSION is not set."
+    fi
   fi
 }
 
