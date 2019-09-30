@@ -279,7 +279,7 @@ END
   fi
 }
 
-_deploy_pre() {
+_dispatch_pre() {
   if [ -z "${GITHUB_TOKEN}" ]; then
     _error "GITHUB_TOKEN is not set."
   fi
@@ -308,20 +308,20 @@ _deploy_pre() {
   fi
 }
 
-_deploy() {
-  _deploy_pre
-
-  ACCEPT_HEADER="Accept: application/vnd.github.everest-preview+json"
+_dispatch() {
+  _dispatch_pre
 
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+
+  ACCEPT_HEADER="Accept: application/vnd.github.everest-preview+json"
 
   echo "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
   curl \
     -sSL \
     -X POST \
-    -H "${ACCEPT_HEADER}" \
     -H "${AUTH_HEADER}" \
+    -H "${ACCEPT_HEADER}" \
      --data @- \
     ${URL} <<END
 {
@@ -495,8 +495,8 @@ case "${CMD:2}" in
   release)
     _release
     ;;
-  deploy)
-    _deploy
+  dispatch)
+    _dispatch
     ;;
   docker)
     _docker
