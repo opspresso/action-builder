@@ -323,12 +323,8 @@ _deploy() {
     -X POST \
     -H "${ACCEPT_HEADER}" \
     -H "${AUTH_HEADER}" \
-     --data @- \
-    ${URL} <<END
-{
-  "event_type": "${EVENT_TYPE}"
-}
-END
+    --data "{\"event_type\":\"${EVENT_TYPE}\"}" \
+    ${URL}
 }
 
 _docker_tag() {
