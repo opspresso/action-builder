@@ -279,6 +279,45 @@ END
   fi
 }
 
+_deploy_pre() {
+  if [ -z "${GITHUB_TOKEN}" ]; then
+    _error "GITHUB_TOKEN is not set."
+  fi
+
+  if [ -z "${ENV_REPO}" ]; then
+    _error "ENV_REPO is not set."
+  fi
+
+  if [ -z "${TARGET_ID}" ]; then
+    _error "TARGET_ID is not set."
+  fi
+
+  if [ -z "${VERSION}" ]; then
+    _error "VERSION is not set."
+  fi
+}
+
+_deploy() {
+  _deploy_pre
+
+  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+
+  echo "github dispatches create ${ENV_REPO} ${TARGET_ID} ${VERSION}"
+  URL="https://api.github.com/repos/${ENV_REPO}/dispatches"
+  curl \
+    -sSL \
+    -X POST \
+    -H "${AUTH_HEADER}" \
+    --data @- \
+    ${URL} <<END
+{
+ "event_type": "deploy",
+ "target_id": "${TARGET_ID}",
+ "version": "${VERSION}"
+}
+END
+}
+
 _docker_tag() {
   if [ -z "${TAG_NAME}" ]; then
     if [ -f ./target/TAG_NAME ]; then
@@ -443,6 +482,9 @@ case "${CMD:2}" in
     ;;
   release)
     _release
+    ;;
+  deploy)
+    _deploy
     ;;
   docker)
     _docker
