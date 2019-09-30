@@ -317,14 +317,17 @@ _deploy() {
 
   echo "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
-  echo "github dispatches create ${URL}"
   curl \
     -sSL \
     -X POST \
     -H "${ACCEPT_HEADER}" \
     -H "${AUTH_HEADER}" \
-    --data "{\"event_type\":\"${EVENT_TYPE}\"}" \
-    ${URL}
+     --data @- \
+    ${URL} <<END
+{
+  "event_type": "${EVENT_TYPE}"
+}
+END
 }
 
 _docker_tag() {
