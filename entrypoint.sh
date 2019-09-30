@@ -317,6 +317,7 @@ _deploy() {
 
   echo "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
+  echo "github dispatches create ${URL}"
   curl \
     -sSL \
     -X POST \
