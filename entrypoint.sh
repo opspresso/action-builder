@@ -289,7 +289,7 @@ _deploy_pre() {
   fi
 
   if [ -z "${EVENT_TYPE}" ]; then
-    EVENT_TYPE="created"
+    EVENT_TYPE="build"
   fi
 
   if [ -z "${TARGET_ID}" ]; then
