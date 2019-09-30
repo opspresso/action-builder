@@ -284,8 +284,8 @@ _deploy_pre() {
     _error "GITHUB_TOKEN is not set."
   fi
 
-  if [ -z "${ENV_REPO}" ]; then
-    _error "ENV_REPO is not set."
+  if [ -z "${GITOPS_REPO}" ]; then
+    _error "GITOPS_REPO is not set."
   fi
 
   if [ -z "${TARGET_ID}" ]; then
@@ -309,8 +309,8 @@ _deploy() {
 
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-  echo "github dispatches create ${ENV_REPO} ${TARGET_ID} ${VERSION}"
-  URL="https://api.github.com/repos/${ENV_REPO}/dispatches"
+  echo "github dispatches create ${GITOPS_REPO} ${TARGET_ID} ${VERSION}"
+  URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
   curl \
     -sSL \
     -X POST \
