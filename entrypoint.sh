@@ -325,9 +325,7 @@ _deploy() {
      --data @- \
     ${URL} <<END
 {
-  "event_type": "${EVENT_TYPE}",
-  "target_id": "${TARGET_ID}",
-  "version": "${VERSION}"
+  "event_type": "${EVENT_TYPE}"
 }
 END
 }
