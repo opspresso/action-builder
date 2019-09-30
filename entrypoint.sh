@@ -259,12 +259,12 @@ _release() {
     --data @- \
     ${URL} <<END
 {
- "tag_name": "${TAG_NAME}",
- "target_commitish": "${TARGET_COMMITISH}",
- "name": "${NAME}",
- "body": "${BODY}",
- "draft": ${DRAFT},
- "prerelease": ${PRERELEASE}
+  "tag_name": "${TAG_NAME}",
+  "target_commitish": "${TARGET_COMMITISH}",
+  "name": "${NAME}",
+  "body": "${BODY}",
+  "draft": ${DRAFT},
+  "prerelease": ${PRERELEASE}
 }
 END
   sleep 1
@@ -325,9 +325,9 @@ _deploy() {
     --data @- \
     ${URL} <<END
 {
- "event_type": "${EVENT_TYPE}",
- "target_id": "${TARGET_ID}",
- "version": "${VERSION}"
+  "event_type": "${EVENT_TYPE}",
+  "target_id": "${TARGET_ID}",
+  "version": "${VERSION}"
 }
 END
 }
