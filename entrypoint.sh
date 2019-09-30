@@ -315,7 +315,7 @@ _deploy() {
 
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-  echo "github dispatches create ${GITOPS_REPO} ${TARGET_ID} ${VERSION}"
+  echo "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
   curl \
     -sSL \
