@@ -289,7 +289,7 @@ _deploy_pre() {
   fi
 
   if [ -z "${EVENT_TYPE}" ]; then
-    EVENT_TYPE="build"
+    EVENT_TYPE="created"
   fi
 
   if [ -z "${TARGET_ID}" ]; then
@@ -311,18 +311,18 @@ _deploy_pre() {
 _deploy() {
   _deploy_pre
 
-  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-
   ACCEPT_HEADER="Accept: application/vnd.github.everest-preview+json"
+
+  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
   echo "github dispatches create ${GITOPS_REPO} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
   curl \
     -sSL \
     -X POST \
-    -H "${AUTH_HEADER}" \
     -H "${ACCEPT_HEADER}" \
-    --data @- \
+    -H "${AUTH_HEADER}" \
+     --data @- \
     ${URL} <<END
 {
   "event_type": "${EVENT_TYPE}",
