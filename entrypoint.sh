@@ -309,12 +309,15 @@ _deploy() {
 
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
+  ACCEPT_HEADER="Accept: application/vnd.github.everest-preview+json"
+
   echo "github dispatches create ${GITOPS_REPO} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
   curl \
     -sSL \
     -X POST \
     -H "${AUTH_HEADER}" \
+    -H "${ACCEPT_HEADER}" \
     --data @- \
     ${URL} <<END
 {
