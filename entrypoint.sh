@@ -288,6 +288,10 @@ _deploy_pre() {
     _error "GITOPS_REPO is not set."
   fi
 
+  if [ -z "${EVENT_TYPE}" ]; then
+    _error "EVENT_TYPE is not set."
+  fi
+
   if [ -z "${TARGET_ID}" ]; then
     _error "TARGET_ID is not set."
   fi
@@ -321,7 +325,7 @@ _deploy() {
     --data @- \
     ${URL} <<END
 {
- "event_type": "deploy",
+ "event_type": "${EVENT_TYPE}",
  "target_id": "${TARGET_ID}",
  "version": "${VERSION}"
 }
