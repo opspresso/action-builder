@@ -289,11 +289,11 @@ _deploy_pre() {
   fi
 
   if [ -z "${EVENT_TYPE}" ]; then
-    _error "EVENT_TYPE is not set."
+    EVENT_TYPE="build"
   fi
 
   if [ -z "${TARGET_ID}" ]; then
-    _error "TARGET_ID is not set."
+    TARGET_ID="${GITHUB_REPOSITORY}"
   fi
 
   if [ -z "${VERSION}" ]; then
