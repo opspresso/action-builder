@@ -356,8 +356,8 @@ _docker_image_uri_tag() {
 _docker_push() {
   IMAGE_URI_TAG="$(_docker_image_uri_tag ${TAG_NAME})"
 
-  echo "docker build -t ${IMAGE_URI_TAG} ."
-  docker build -t ${IMAGE_URI_TAG} .
+  echo "docker build -t ${IMAGE_URI_TAG} ${BUILD_PATH}"
+  docker build -t ${IMAGE_URI_TAG} ${BUILD_PATH}
 
   echo "docker push ${IMAGE_URI_TAG}"
   docker push ${IMAGE_URI_TAG}
@@ -380,6 +380,10 @@ _docker_pre() {
 
   if [ -z "${PASSWORD}" ]; then
     _error "PASSWORD is not set."
+  fi
+
+  if [ -z "${BUILD_PATH}" ]; then
+    BUILD_PATH="."
   fi
 
   if [ -z "${IMAGE_NAME}" ]; then
@@ -414,6 +418,10 @@ _docker_ecr_pre() {
 
   if [ -z "${AWS_ACCOUNT_ID}" ]; then
     AWS_ACCOUNT_ID="$(aws sts get-caller-identity | grep "Account" | cut -d'"' -f4)"
+  fi
+
+  if [ -z "${BUILD_PATH}" ]; then
+    BUILD_PATH="."
   fi
 
   if [ -z "${IMAGE_NAME}" ]; then
