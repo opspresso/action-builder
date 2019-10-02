@@ -1,0 +1,11 @@
+name: 'Opspresso Builder'
+description: 'Builder for GitHub Action'
+author: 'Jungyoul Yu <@nalbam>'
+
+branding:
+  icon: 'box'
+  color: 'blue'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
