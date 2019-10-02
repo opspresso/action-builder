@@ -1,5 +1,8 @@
 # Opspresso Builder
 
+[![GitHub Actions status](https://github.com/opspresso/action-builder/workflows/Build-Push/badge.svg)](https://github.com/opspresso/action-builder/actions)
+[![GitHub Releases](https://img.shields.io/github/release/opspresso/action-builder.svg)](https://github.com/opspresso/action-builder/releases)
+
 ## Usage
 
 ```yaml
