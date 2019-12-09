@@ -347,6 +347,9 @@ _docker_tag() {
       _error "TAG_NAME is not set."
     fi
   fi
+  if [ ! -z "${TAG_POST}" ]; then
+    TAG_NAME="${TAG_NAME}-${TAG_POST}"
+  fi
 }
 
 _docker_image_uri_tag() {
