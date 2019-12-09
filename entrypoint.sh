@@ -189,6 +189,10 @@ _release_pre() {
     fi
   fi
 
+  if [ ! -z "${TAG_POST}" ]; then
+    TAG_NAME="${TAG_NAME}-${TAG_POST}"
+  fi
+
   if [ -z "${TARGET_COMMITISH}" ]; then
     TARGET_COMMITISH="master"
   fi
