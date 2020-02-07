@@ -444,7 +444,7 @@ _docker_ecr_pre() {
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
-    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME:-${REPONAME}}"
+    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
   fi
 
   _docker_tag
