@@ -61,6 +61,18 @@ jobs:
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
+      - name: Build & Push to GitHub Package
+        uses: opspresso/action-builder@v0.2.6
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
+          REGISTRY: "docker.pkg.github.com"
+          IMAGE_NAME: "user_id/image_name"
+          TAG_NAME: "v0.0.1"
+          LATEST: "true"
+
       - name: Build & Push to AWS ECR
         uses: opspresso/action-docker@master
         with:
