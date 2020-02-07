@@ -62,7 +62,7 @@ jobs:
           LATEST: "true"
 
       - name: Build & Push to GitHub Package
-        uses: opspresso/action-builder@v0.2.7
+        uses: opspresso/action-builder@v0.2.8
         with:
           args: --docker
         env:
