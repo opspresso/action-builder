@@ -1,11 +1,11 @@
-name: 'Opspresso Builder'
-description: 'Builder for GitHub Action'
-author: 'Jungyoul Yu <@nalbam>'
+name: "Opspresso Builder"
+description: "Builder for GitHub Action"
+author: "Jungyoul Yu <@nalbam>"
 
 branding:
-  icon: 'box'
-  color: 'blue'
+  icon: "box"
+  color: "blue"
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "docker"
+  image: "Dockerfile"
