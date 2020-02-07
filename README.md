@@ -57,19 +57,17 @@ jobs:
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          IMAGE_NAME: "user_id/image_name"
+          IMAGE_NAME: "USERNAME/IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
       - name: Build & Push to GitHub Package
-        uses: opspresso/action-builder@master
-        with:
-          args: --docker
+        uses: opspresso/action-docker@master
         env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          USERNAME: ${{ secrets.GITHUB_USERNAME }}
           PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
           REGISTRY: "docker.pkg.github.com"
-          IMAGE_NAME: "user_id/image_name"
+          IMAGE_NAME: "IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
@@ -80,7 +78,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          IMAGE_URI: "xxxx.dkr.ecr.us-east-1.amazonaws.com/image_name"
+          IMAGE_URI: "xxxx.dkr.ecr.us-east-1.amazonaws.com/IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
