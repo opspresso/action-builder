@@ -401,19 +401,13 @@ _docker_pre() {
     BUILD_PATH="."
   fi
 
-  if [ -z "${IMAGE_NAME}" ]; then
-    IMAGE_NAME="${GITHUB_REPOSITORY}"
-  fi
-
   if [ -z "${IMAGE_URI}" ]; then
     if [ -z "${REGISTRY}" ]; then
-      IMAGE_URI="${IMAGE_NAME}"
+      IMAGE_URI="${IMAGE_NAME:-${REPOSITORY}}"
+    elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
+      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME:-${REPONAME}}"
     else
-      if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-        IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
-      else
-        IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
-      fi
+      IMAGE_URI="${REGISTRY}/${IMAGE_NAME:-${REPOSITORY}}"
     fi
   fi
 
@@ -446,11 +440,11 @@ _docker_ecr_pre() {
   fi
 
   if [ -z "${IMAGE_NAME}" ]; then
-    IMAGE_NAME="${GITHUB_REPOSITORY}"
+    IMAGE_NAME="${REPOSITORY}"
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
-    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
+    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME:-${REPONAME}}"
   fi
 
   _docker_tag
