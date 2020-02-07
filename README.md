@@ -53,7 +53,9 @@ jobs:
           TAG_NAME: "v0.0.1"
 
       - name: Build & Push to Docker Hub
-        uses: opspresso/action-docker@master
+        uses: opspresso/action-builder@master
+        with:
+          args: --docker
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -62,7 +64,9 @@ jobs:
           LATEST: "true"
 
       - name: Build & Push to GitHub Package
-        uses: opspresso/action-docker@master
+        uses: opspresso/action-builder@master
+        with:
+          args: --docker
         env:
           USERNAME: ${{ secrets.GITHUB_USERNAME }}
           PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
@@ -72,7 +76,7 @@ jobs:
           LATEST: "true"
 
       - name: Build & Push to AWS ECR
-        uses: opspresso/action-docker@master
+        uses: opspresso/action-builder@master
         with:
           args: --ecr
         env:
