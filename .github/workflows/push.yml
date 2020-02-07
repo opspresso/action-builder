@@ -32,4 +32,3 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
           REGISTRY: "docker.pkg.github.com"
-          LATEST: "true"

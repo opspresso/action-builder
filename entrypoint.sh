@@ -368,35 +368,23 @@ _docker_tag() {
   fi
 }
 
-_docker_image_uri_tag() {
-  if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-    printf "${IMAGE_URI}/${1}"
-  else
-    printf "${IMAGE_URI}:${1}"
-  fi
-}
-
 _docker_push() {
-  IMAGE_URI_TAG="$(_docker_image_uri_tag ${TAG_NAME})"
-
-  echo "docker build -t ${IMAGE_URI_TAG} ${BUILD_PATH}"
-  docker build -t ${IMAGE_URI_TAG} ${BUILD_PATH}
+  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH}"
+  docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH}
 
   _error_check
 
-  echo "docker push ${IMAGE_URI_TAG}"
-  docker push ${IMAGE_URI_TAG}
+  echo "docker push ${IMAGE_URI}:${TAG_NAME}"
+  docker push ${IMAGE_URI}:${TAG_NAME}
 
   _error_check
 
   if [ "${LATEST}" == "true" ]; then
-    IMAGE_URI_LATEST="$(_docker_image_uri_tag latest)"
+    echo "docker tag ${IMAGE_URI}:latet"
+    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latet
 
-    echo "docker tag ${IMAGE_URI_LATEST}"
-    docker tag ${IMAGE_URI_TAG} ${IMAGE_URI_LATEST}
-
-    echo "docker push ${IMAGE_URI_LATEST}"
-    docker push ${IMAGE_URI_LATEST}
+    echo "docker push ${IMAGE_URI}:latet"
+    docker push ${IMAGE_URI}:latet
   fi
 }
 
@@ -421,7 +409,11 @@ _docker_pre() {
     if [ -z "${REGISTRY}" ]; then
       IMAGE_URI="${IMAGE_NAME}"
     else
-      IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
+      if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
+        IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
+      else
+        IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
+      fi
     fi
   fi
 
