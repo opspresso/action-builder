@@ -380,11 +380,11 @@ _docker_push() {
   _error_check
 
   if [ "${LATEST}" == "true" ]; then
-    echo "docker tag ${IMAGE_URI}:latet"
-    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latet
+    echo "docker tag ${IMAGE_URI}:latest"
+    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
 
-    echo "docker push ${IMAGE_URI}:latet"
-    docker push ${IMAGE_URI}:latet
+    echo "docker push ${IMAGE_URI}:latest"
+    docker push ${IMAGE_URI}:latest
   fi
 }
 
