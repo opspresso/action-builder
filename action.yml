@@ -7,5 +7,5 @@ branding:
   color: "blue"
 
 runs:
-  using: "docker"
-  image: "docker://opspresso/action-builder:v0.2.9"
+  using: docker
+  image: docker://opspresso/action-builder:v0.2.9
