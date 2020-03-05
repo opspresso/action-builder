@@ -333,7 +333,7 @@ _dispatch() {
 
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-  ACCEPT_HEADER="Accept: application/vnd.github.everest-preview+json"
+  ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
 
   echo "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
   URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
