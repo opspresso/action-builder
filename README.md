@@ -52,18 +52,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: "v0.0.1"
 
-      - name: Build & Push to Docker Hub
+      - name: Docker Build & Push to Docker Hub
         uses: opspresso/action-builder@master
         with:
           args: --docker
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERFILE: "Dockerfile"
           IMAGE_NAME: "USERNAME/IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
-      - name: Build & Push to GitHub Package
+      - name: Docker Build & Push to GitHub Package
         uses: opspresso/action-builder@master
         with:
           args: --docker
@@ -71,11 +72,12 @@ jobs:
           USERNAME: ${{ secrets.GITHUB_USERNAME }}
           PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
           REGISTRY: "docker.pkg.github.com"
+          DOCKERFILE: "Dockerfile"
           IMAGE_NAME: "IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
-      - name: Build & Push to AWS ECR
+      - name: Docker Build & Push to AWS ECR
         uses: opspresso/action-builder@master
         with:
           args: --ecr
@@ -83,6 +85,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           IMAGE_URI: "xxxx.dkr.ecr.us-east-1.amazonaws.com/IMAGE_NAME"
+          DOCKERFILE: "Dockerfile.aws"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
 
