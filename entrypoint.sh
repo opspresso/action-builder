@@ -360,7 +360,7 @@ _docker_tag() {
       TAG_NAME=$(cat ./VERSION | xargs)
     fi
     if [ -z "${TAG_NAME}" ]; then
-      _error "TAG_NAME is not set."
+      TAG_NAME="latest"
     fi
   fi
   if [ ! -z "${TAG_POST}" ]; then
@@ -369,8 +369,8 @@ _docker_tag() {
 }
 
 _docker_push() {
-  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH}"
-  docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH}
+  echo "docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} --file=${DOCKERFILE}"
+  docker build -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} --file=${DOCKERFILE}
 
   _error_check
 
@@ -399,6 +399,10 @@ _docker_pre() {
 
   if [ -z "${BUILD_PATH}" ]; then
     BUILD_PATH="."
+  fi
+
+  if [ -z "${DOCKERFILE}" ]; then
+    DOCKERFILE="Dockerfile"
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
