@@ -267,7 +267,7 @@ _release() {
       -X DELETE \
       -H "${AUTH_HEADER}" \
       ${URL}
-    sleep 1
+    sleep 3
   fi
 
   echo "github releases create ${TAG_NAME} ${DRAFT} ${PRERELEASE}"
@@ -287,7 +287,7 @@ _release() {
   "prerelease": ${PRERELEASE}
 }
 END
-  sleep 1
+  sleep 3
 
   _release_id
   if [ -z "${RELEASE_ID}" ]; then
