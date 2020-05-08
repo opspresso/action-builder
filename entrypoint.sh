@@ -470,6 +470,10 @@ _docker_ecr_pre() {
     BUILD_PATH="."
   fi
 
+  if [ -z "${DOCKERFILE}" ]; then
+    DOCKERFILE="Dockerfile"
+  fi
+
   if [ -z "${IMAGE_NAME}" ]; then
     IMAGE_NAME="${REPOSITORY}"
   fi
