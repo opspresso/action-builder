@@ -34,7 +34,7 @@ jobs:
           REGISTRY: "docker.pkg.github.com"
 
       - name: Docker Build & Push to AWS ECR
-        uses: opspresso/action-builder@master
+        uses: opspresso/action-docker@master
         with:
           args: --ecr
         env:
