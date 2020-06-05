@@ -70,7 +70,7 @@ jobs:
           args: --docker
         env:
           USERNAME: ${{ secrets.GITHUB_USERNAME }}
-          PASSWORD: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
+          PASSWORD: ${{ secrets.GH_PERSONAL_TOKEN }}
           REGISTRY: "docker.pkg.github.com"
           DOCKERFILE: "Dockerfile"
           IMAGE_NAME: "IMAGE_NAME"
