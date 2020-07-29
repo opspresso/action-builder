@@ -463,7 +463,7 @@ _docker_ecr_pre() {
   _aws_pre
 
   if [ -z "${AWS_ACCOUNT_ID}" ]; then
-    AWS_ACCOUNT_ID="$(aws sts get-caller-identity | grep "Account" | cut -d'"' -f4)"
+    AWS_ACCOUNT_ID="$(aws sts get-caller-identity --output json | jq '.Account' -r)"
   fi
 
   if [ -z "${BUILD_PATH}" ]; then
@@ -505,7 +505,7 @@ EOF
 
   _error_check
 
-  COUNT=$(aws ecr describe-repositories | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
+  COUNT=$(aws ecr describe-repositories --output json | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
   if [ "x${COUNT}" == "x0" ]; then
     echo "aws ecr create-repository ${IMAGE_NAME}"
     aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
