@@ -50,6 +50,7 @@ jobs:
           args: --release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_COMMITISH: main
           TAG_NAME: "v0.0.1"
 
       - name: Docker Build & Push to Docker Hub
