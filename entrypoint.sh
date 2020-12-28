@@ -55,13 +55,20 @@ _version() {
     VERSION="${MAJOR}.${MINOR}.${PATCH}"
     printf "${VERSION}" > ./VERSION
   else
-    AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+    if [ "${GITHUB_TOKEN}" != "" ]; then
+      AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-    URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-    curl \
-      -sSL \
-      -H "${AUTH_HEADER}" \
-      ${URL} > /tmp/releases
+      URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+      curl \
+        -sSL \
+        -H "${AUTH_HEADER}" \
+        ${URL} > /tmp/releases
+    else
+      URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+      curl \
+        -sSL \
+        ${URL} > /tmp/releases
+    fi
 
     VERSION=$(cat /tmp/releases | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
 
@@ -233,8 +240,6 @@ _release_pre() {
 }
 
 _release_id() {
-  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-
   URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
   curl \
     -sSL \
