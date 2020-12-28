@@ -72,7 +72,7 @@ _version() {
 
     VERSION=$(cat /tmp/releases | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
 
-    if [ -z ${VERSION} ]; then
+    if [ -z "${VERSION}" ]; then
       VERSION="${MAJOR}.${MINOR}.0"
     fi
 
