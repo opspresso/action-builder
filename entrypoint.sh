@@ -79,7 +79,7 @@ _version() {
     echo "VERSION: ${VERSION}"
 
     # new version
-    if [ "${GITHUB_REF}" == "refs/heads/master" ]; then
+    if [ "${GITHUB_REF}" == "refs/heads/main" ] || [ "${GITHUB_REF}" == "refs/heads/master" ]; then
       VERSION=$(echo ${VERSION} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
     else
       if [ "${GITHUB_REF}" != "" ]; then
