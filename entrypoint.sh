@@ -519,8 +519,14 @@ ${AWS_REGION}
 text
 EOF
 
-  echo "aws ecr get-login --no-include-email"
-  aws ecr get-login --no-include-email | sh
+  # https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html
+  # echo "aws ecr get-login --no-include-email"
+  # aws ecr get-login --no-include-email | sh
+
+  ACCOUNT_ID=$(aws sts get-caller-identity | jq .Account -r)
+
+  echo "aws ecr get-login-password ${ACCOUNT_ID} ${AWS_REGION}"
+  aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/
 
   _error_check
 
