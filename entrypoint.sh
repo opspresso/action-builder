@@ -403,7 +403,7 @@ _dispatch() {
   curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    --data '{"event_type":"${EVENT_TYPE}","client_payload":{"project":"${PROJECT}","version":"${VERSION}"}}' \
+    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\"}}" \
     https://api.github.com/repos/${GITOPS_REPO}/dispatches
 }
 
