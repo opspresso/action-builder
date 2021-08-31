@@ -400,12 +400,11 @@ _dispatch() {
 
   _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION}"
 
-  curl -sL \
-    -X POST \
+  curl -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    https://api.github.com/repos/${GITOPS_REPO}/dispatches \
-    -d '{"event_type":"${EVENT_TYPE}","client_payload":{"project":"${PROJECT}","version":"${VERSION}"}}'
+    --data '{"event_type":"${EVENT_TYPE}","client_payload":{"project":"${PROJECT}","version":"${VERSION}"}}' \
+    https://api.github.com/repos/${GITOPS_REPO}/dispatches
 }
 
 _docker_tag() {
