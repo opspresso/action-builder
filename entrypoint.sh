@@ -398,23 +398,14 @@ _dispatch_pre() {
 _dispatch() {
   _dispatch_pre
 
-  AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-
-  ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
-
   _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
-  URL="https://api.github.com/repos/${GITOPS_REPO}/dispatches"
+
   curl \
-    -sSL \
     -X POST \
-    -H "${AUTH_HEADER}" \
-    -H "${ACCEPT_HEADER}" \
-     --data @- \
-    ${URL} <<END
-{
-  "event_type": "${EVENT_TYPE}"
-}
-END
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Authorization: token ${GITHUB_TOKEN}" \
+    https://api.github.com/repos/${GITOPS_REPO}/dispatches \
+    -d '{"event_type":"${EVENT_TYPE}","client_payload":{"target_id":"${TARGET_ID}","version":"${VERSION}"}}'
 }
 
 _docker_tag() {
