@@ -379,8 +379,8 @@ _dispatch_pre() {
     EVENT_TYPE="build"
   fi
 
-  if [ -z "${TARGET_ID}" ]; then
-    TARGET_ID="${GITHUB_REPOSITORY}"
+  if [ -z "${PROJECT}" ]; then
+    PROJECT="${GITHUB_REPOSITORY}"
   fi
 
   if [ -z "${VERSION}" ]; then
@@ -398,14 +398,14 @@ _dispatch_pre() {
 _dispatch() {
   _dispatch_pre
 
-  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET_ID} ${VERSION}"
+  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION}"
 
   curl \
     -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: token ${GITHUB_TOKEN}" \
     https://api.github.com/repos/${GITOPS_REPO}/dispatches \
-    -d '{"event_type":"${EVENT_TYPE}","client_payload":{"target_id":"${TARGET_ID}","version":"${VERSION}"}}'
+    -d '{"event_type":"${EVENT_TYPE}","client_payload":{"project":"${PROJECT}","version":"${VERSION}"}}'
 }
 
 _docker_tag() {
