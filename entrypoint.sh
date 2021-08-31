@@ -376,7 +376,7 @@ _dispatch_pre() {
   fi
 
   if [ -z "${EVENT_TYPE}" ]; then
-    EVENT_TYPE="build"
+    EVENT_TYPE="gitops"
   fi
 
   if [ -z "${PROJECT}" ]; then
@@ -400,7 +400,7 @@ _dispatch() {
 
   _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION}"
 
-  curl -X POST \
+  curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     --data '{"event_type":"${EVENT_TYPE}","client_payload":{"project":"${PROJECT}","version":"${VERSION}"}}' \
