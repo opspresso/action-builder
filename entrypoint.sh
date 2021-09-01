@@ -430,7 +430,7 @@ _docker_tag() {
   fi
 }
 
-_docker_push() {
+_docker_build() {
   _command "docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
   docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}
 
@@ -448,6 +448,22 @@ _docker_push() {
     _command "docker push ${IMAGE_URI}:latest"
     docker push ${IMAGE_URI}:latest
   fi
+}
+
+_docker_buildx() {
+  _command "docker buildx build -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
+  docker buildx build --push -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} \
+    --platform ${PLATFORM}
+
+  _error_check
+
+  # if [ "${LATEST}" == "true" ]; then
+  #   _command "docker tag ${IMAGE_URI}:latest"
+  #   docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
+
+  #   _command "docker push ${IMAGE_URI}:latest"
+  #   docker push ${IMAGE_URI}:latest
+  # fi
 }
 
 _docker_pre() {
@@ -477,6 +493,10 @@ _docker_pre() {
     fi
   fi
 
+  if [ -z "${PLATFORM}" ]; then
+    PLATFORM="linux/arm/v7,linux/arm64/v8,linux/amd64"
+  fi
+
   _docker_tag
 }
 
@@ -488,7 +508,11 @@ _docker() {
 
   _error_check
 
-  _docker_push
+  if [ "${BUILDX}" == "true" ]; then
+    _docker_buildx
+  else
+    _docker_build
+  fi
 
   _command "docker logout"
   docker logout
@@ -550,7 +574,11 @@ EOF
     aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
   fi
 
-  _docker_push
+  if [ "${BUILDX}" == "true" ]; then
+    _docker_buildx
+  else
+    _docker_build
+  fi
 }
 
 _slack_pre() {
