@@ -7,6 +7,8 @@ REPOSITORY=${GITHUB_REPOSITORY}
 USERNAME=${USERNAME:-$GITHUB_ACTOR}
 REPONAME=$(echo "${REPOSITORY}" | cut -d'/' -f2)
 
+BUILD_PLACE=0
+
 command -v tput > /dev/null && TPUT=true
 
 _echo() {
@@ -496,8 +498,10 @@ _docker_buildx() {
     PLATFORM="linux/arm64,linux/amd64"
   fi
 
-  _command "docker buildx create --use --name opspresso"
-  docker buildx create --use --name opspresso
+  BUILD_PLACE=$((BUILD_PLACE+1))
+
+  _command "docker buildx create --use --name opspresso-${BUILD_PLACE}"
+  docker buildx create --use --name opspresso-${BUILD_PLACE}
 
   _command "docker buildx build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
   docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
