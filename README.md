@@ -64,6 +64,7 @@ jobs:
           IMAGE_NAME: "USERNAME/IMAGE_NAME"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
+          BUILDX: "true"
 
       - name: Docker Build & Push to GitHub Package
         uses: opspresso/action-builder@master
@@ -89,6 +90,7 @@ jobs:
           DOCKERFILE: "Dockerfile.aws"
           TAG_NAME: "v0.0.1"
           LATEST: "true"
+          BUILDX: "true"
 
       - name: Post to Slack
         uses: opspresso/action-builder@master
