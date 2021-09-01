@@ -561,11 +561,12 @@ _docker() {
   if [ "${BUILDX}" == "true" ]; then
     _docker_buildx
   else
-    if [ "${PLATFORM}" == "" ]; then
-      _docker_build
-    else
-      _docker_builds
-    fi
+    _docker_build
+    # if [ "${PLATFORM}" == "" ]; then
+    #   _docker_build
+    # else
+    #   _docker_builds
+    # fi
   fi
 
   _command "docker logout"
@@ -638,11 +639,12 @@ EOF
   if [ "${BUILDX}" == "true" ]; then
     _docker_buildx
   else
-    if [ "${PLATFORM}" == "" ]; then
-      _docker_build
-    else
-      _docker_builds
-    fi
+    _docker_build
+    # if [ "${PLATFORM}" == "" ]; then
+    #   _docker_build
+    # else
+    #   _docker_builds
+    # fi
   fi
 }
 
