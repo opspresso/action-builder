@@ -616,8 +616,8 @@ EOF
   PUBLIC=$(echo ${REGISTRY} | cut -d'.' -f1)
 
   if [ "${PUBLIC}" == "public" ]; then
-    _command "aws ecr-public get-login-password --region ${AWS_REGION} ${REGISTRY}"
-    aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
+    _command "aws ecr-public get-login-password --region us-east-1 ${REGISTRY}"
+    aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REGISTRY}
   else
     _command "aws ecr get-login-password --region ${AWS_REGION} ${REGISTRY}"
     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
