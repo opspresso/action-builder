@@ -494,11 +494,11 @@ _docker_pre() {
     fi
   fi
 
+  _docker_tag
+
   if [ -z "${PLATFORM}" ]; then
     PLATFORM="linux/arm/v7,linux/arm64/v8,linux/amd64"
   fi
-
-  _docker_tag
 }
 
 _docker() {
@@ -546,6 +546,10 @@ _docker_ecr_pre() {
 
   if [ "${IMAGE_TAG_MUTABILITY}" != "IMMUTABLE" ]; then
     IMAGE_TAG_MUTABILITY="MUTABLE"
+  fi
+
+  if [ -z "${PLATFORM}" ]; then
+    PLATFORM="linux/arm/v7,linux/arm64/v8,linux/amd64"
   fi
 }
 
