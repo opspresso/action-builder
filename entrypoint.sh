@@ -482,6 +482,8 @@ _docker_manifest() {
   _command "docker manifest create ${IMAGE_URI}:${1} ${2}"
   docker manifest create ${IMAGE_URI}:${1} ${2}
 
+  _error_check
+
   _command "docker manifest inspect ${IMAGE_URI}:${1}"
   docker manifest inspect ${IMAGE_URI}:${1}
 
@@ -496,6 +498,9 @@ _docker_buildx() {
   docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
 
   _error_check
+
+  _command "docker buildx imagetools inspect ${IMAGE_URI}:${TAG_NAME}"
+  docker buildx imagetools inspect ${IMAGE_URI}:${TAG_NAME}
 
   if [ "${LATEST}" == "true" ]; then
     _docker_manifest latest ${IMAGE_URI}:${TAG_NAME}
