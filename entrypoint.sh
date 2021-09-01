@@ -594,9 +594,9 @@ _docker_ecr_pre() {
 
   if [ -z "${IMAGE_NAME}" ]; then
     if [ "${PUBLIC}" == "public" ]; then
-      IMAGE_NAME="${REPOSITORY}"
-    else
       IMAGE_NAME="${REPONAME}"
+    else
+      IMAGE_NAME="${REPOSITORY}"
     fi
   fi
 
