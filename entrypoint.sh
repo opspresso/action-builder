@@ -496,10 +496,10 @@ _docker_buildx() {
     PLATFORM="linux/arm64,linux/amd64"
   fi
 
-  RND=$(xxd -l4 -ps /dev/urandom)
+  PLACE=$(date +%s)
 
-  _command "docker buildx create --use --name ops-${RND}"
-  docker buildx create --use --name ops-${RND}
+  _command "docker buildx create --use --name ops-${PLACE}"
+  docker buildx create --use --name ops-${PLACE}
 
   _command "docker buildx build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
   docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
