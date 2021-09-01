@@ -492,6 +492,11 @@ _docker_manifest() {
 }
 
 _docker_buildx() {
+  if [ -z "${PLATFORM}" ]; then
+    PLATFORM="linux/arm64,linux/amd64"
+  fi
+
+  _command "docker buildx create --use --name opspresso"
   docker buildx create --use --name opspresso
 
   _command "docker buildx build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
@@ -535,10 +540,6 @@ _docker_pre() {
   fi
 
   _docker_tag
-
-  # if [ -z "${PLATFORM}" ]; then
-  #   PLATFORM="linux/arm/v7,linux/arm64/v8,linux/amd64"
-  # fi
 }
 
 _docker() {
@@ -591,10 +592,6 @@ _docker_ecr_pre() {
   if [ "${IMAGE_TAG_MUTABILITY}" != "IMMUTABLE" ]; then
     IMAGE_TAG_MUTABILITY="MUTABLE"
   fi
-
-  # if [ -z "${PLATFORM}" ]; then
-  #   PLATFORM="linux/arm/v7,linux/arm64/v8,linux/amd64"
-  # fi
 }
 
 _docker_ecr() {
