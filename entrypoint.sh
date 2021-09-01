@@ -450,21 +450,56 @@ _docker_build() {
   fi
 }
 
+_docker_builds() {
+  TAG_NAMES=""
+
+  ARR=(${PLATFORM//,/ })
+
+  for V in ${ARR[@]}; do
+      P="${V//\//-}"
+
+      _command "docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}"
+      docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}
+
+      _error_check
+
+      _command "docker push ${IMAGE_URI}:${TAG_NAME}-${P}"
+      docker push ${IMAGE_URI}:${TAG_NAME}-${P}
+
+      _error_check
+
+      TAG_NAMES="${TAG_NAMES},${IMAGE_URI}:${TAG_NAME}-${P}"
+  done
+
+  _docker_manifest ${TAG_NAME} ${TAG_NAMES:1}
+
+  if [ "${LATEST}" == "true" ]; then
+    _docker_manifest latest ${TAG_NAMES:1}
+  fi
+}
+
+_docker_manifest() {
+  _command "docker manifest create ${IMAGE_URI}:${1}"
+  docker manifest create ${IMAGE_URI}:${1} ${2}
+
+  _command "docker manifest inspect ${IMAGE_URI}:${1}"
+  docker manifest inspect ${IMAGE_URI}:${1}
+
+  _command "docker manifest push ${IMAGE_URI}:${1}"
+  docker manifest push ${IMAGE_URI}:${1}
+}
+
 _docker_buildx() {
   docker buildx create --use --name opspresso
 
-  _command "docker buildx build -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
-  docker buildx build --push -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
+  _command "docker buildx build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
+  docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
 
   _error_check
 
-  # if [ "${LATEST}" == "true" ]; then
-  #   _command "docker tag ${IMAGE_URI}:latest"
-  #   docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
-
-  #   _command "docker push ${IMAGE_URI}:latest"
-  #   docker push ${IMAGE_URI}:latest
-  # fi
+  if [ "${LATEST}" == "true" ]; then
+    _docker_manifest latest ${IMAGE_URI}:${TAG_NAME}
+  fi
 }
 
 _docker_pre() {
@@ -512,7 +547,11 @@ _docker() {
   if [ "${BUILDX}" == "true" ]; then
     _docker_buildx
   else
-    _docker_build
+    if [ "${PLATFORM}" == "" ]; then
+      _docker_build
+    else
+      _docker_builds
+    fi
   fi
 
   _command "docker logout"
@@ -569,7 +608,7 @@ EOF
   # aws ecr get-login --no-include-email | sh
 
   _command "aws ecr get-login-password ${AWS_ACCOUNT_ID} ${AWS_REGION}"
-  aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/
+  aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
   _error_check
 
@@ -582,7 +621,11 @@ EOF
   if [ "${BUILDX}" == "true" ]; then
     _docker_buildx
   else
-    _docker_build
+    if [ "${PLATFORM}" == "" ]; then
+      _docker_build
+    else
+      _docker_builds
+    fi
   fi
 }
 
