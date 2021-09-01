@@ -496,7 +496,7 @@ _docker_buildx() {
     PLATFORM="linux/arm64,linux/amd64"
   fi
 
-  RND=$(openssl rand -hex 8)
+  RND=$(xxd -l4 -ps /dev/urandom)
 
   _command "docker buildx create --use --name ops-${RND}"
   docker buildx create --use --name ops-${RND}
