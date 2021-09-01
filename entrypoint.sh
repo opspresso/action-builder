@@ -458,8 +458,8 @@ _docker_builds() {
   for V in ${ARR[@]}; do
       P="${V//\//-}"
 
-      _command "docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}"
-      docker build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}
+      _command "docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}"
+      docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}
 
       _error_check
 
@@ -471,15 +471,15 @@ _docker_builds() {
       TAG_NAMES="${TAG_NAMES},${IMAGE_URI}:${TAG_NAME}-${P}"
   done
 
-  _docker_manifest ${TAG_NAME} ${TAG_NAMES:1}
+  _docker_manifest ${TAG_NAME} "${TAG_NAMES:1}"
 
   if [ "${LATEST}" == "true" ]; then
-    _docker_manifest latest ${TAG_NAMES:1}
+    _docker_manifest latest "${TAG_NAMES:1}"
   fi
 }
 
 _docker_manifest() {
-  _command "docker manifest create ${IMAGE_URI}:${1}"
+  _command "docker manifest create ${IMAGE_URI}:${1} ${2}"
   docker manifest create ${IMAGE_URI}:${1} ${2}
 
   _command "docker manifest inspect ${IMAGE_URI}:${1}"
