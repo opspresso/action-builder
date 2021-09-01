@@ -586,12 +586,18 @@ _docker_ecr_pre() {
     DOCKERFILE="Dockerfile"
   fi
 
-  if [ -z "${IMAGE_NAME}" ]; then
-    IMAGE_NAME="${REPOSITORY}"
-  fi
-
   if [ -z "${REGISTRY}" ]; then
     REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+  fi
+
+  PUBLIC=$(echo ${REGISTRY} | cut -d'.' -f1)
+
+  if [ -z "${IMAGE_NAME}" ]; then
+    if [ "${PUBLIC}" == "public" ]; then
+      IMAGE_NAME="${REPOSITORY}"
+    else
+      IMAGE_NAME="${REPONAME}"
+    fi
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
@@ -628,10 +634,12 @@ EOF
 
   _error_check
 
-  COUNT=$(aws ecr describe-repositories --output json | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
-  if [ "x${COUNT}" == "x0" ]; then
-    _command "aws ecr create-repository ${IMAGE_NAME}"
-    aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
+  if [ "${PUBLIC}" != "public" ]; then
+    COUNT=$(aws ecr describe-repositories --output json | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
+    if [ "x${COUNT}" == "x0" ]; then
+      _command "aws ecr create-repository ${IMAGE_NAME}"
+      aws ecr create-repository --repository-name ${IMAGE_NAME} --image-tag-mutability ${IMAGE_TAG_MUTABILITY}
+    fi
   fi
 
   if [ "${BUILDX}" == "true" ]; then
