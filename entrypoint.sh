@@ -458,13 +458,13 @@ _docker_buildx() {
 
   _error_check
 
-  # if [ "${LATEST}" == "true" ]; then
-  #   _command "docker tag ${IMAGE_URI}:latest"
-  #   docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
+  if [ "${LATEST}" == "true" ]; then
+    _command "docker tag ${IMAGE_URI}:latest"
+    docker tag ${IMAGE_URI}:${TAG_NAME} ${IMAGE_URI}:latest
 
-  #   _command "docker push ${IMAGE_URI}:latest"
-  #   docker push ${IMAGE_URI}:latest
-  # fi
+    _command "docker push ${IMAGE_URI}:latest"
+    docker push ${IMAGE_URI}:latest
+  fi
 }
 
 _docker_pre() {
