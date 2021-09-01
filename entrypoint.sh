@@ -529,13 +529,17 @@ _docker_pre() {
     DOCKERFILE="Dockerfile"
   fi
 
+  if [ -z "${IMAGE_NAME}" ]; then
+    IMAGE_NAME="${REPOSITORY}"
+  fi
+
   if [ -z "${IMAGE_URI}" ]; then
     if [ -z "${REGISTRY}" ]; then
-      IMAGE_URI="${IMAGE_NAME:-${REPOSITORY}}"
+      IMAGE_URI="${IMAGE_NAME}"
     elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME:-${REPONAME}}"
+      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
     else
-      IMAGE_URI="${REGISTRY}/${IMAGE_NAME:-${REPOSITORY}}"
+      IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
     fi
   fi
 
@@ -583,8 +587,12 @@ _docker_ecr_pre() {
     IMAGE_NAME="${REPOSITORY}"
   fi
 
+  if [ -z "${REGISTRY}" ]; then
+    REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+  fi
+
   if [ -z "${IMAGE_URI}" ]; then
-    IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
+    IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
   fi
 
   _docker_tag
@@ -605,12 +613,15 @@ ${AWS_REGION}
 text
 EOF
 
-  # https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html
-  # _command "aws ecr get-login --no-include-email"
-  # aws ecr get-login --no-include-email | sh
+  PUBLIC=$(echo ${REGISTRY} | cut -d'.' -f1)
 
-  _command "aws ecr get-login-password ${AWS_ACCOUNT_ID} ${AWS_REGION}"
-  aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  if [ "${PUBLIC}" == "public" ]; then
+    _command "aws ecr-public get-login-password --region ${AWS_REGION} ${REGISTRY}"
+    aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
+  else
+    _command "aws ecr get-login-password --region ${AWS_REGION} ${REGISTRY}"
+    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
+  fi
 
   _error_check
 
