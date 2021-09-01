@@ -451,8 +451,10 @@ _docker_build() {
 }
 
 _docker_buildx() {
+  docker buildx create --use --name opspresso
+
   _command "docker buildx build -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
-  docker buildx use $(docker buildx build --push -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM})
+  docker buildx build --push -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
 
   _error_check
 
