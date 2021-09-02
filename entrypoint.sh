@@ -532,17 +532,21 @@ _docker_pre() {
   fi
 
   if [ -z "${IMAGE_NAME}" ]; then
-    IMAGE_NAME="${REPOSITORY}"
+    if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
+      IMAGE_NAME="${REPONAME}"
+    else
+      IMAGE_NAME="${REPOSITORY}"
+    fi
   fi
 
   if [ -z "${IMAGE_URI}" ]; then
     if [ -z "${REGISTRY}" ]; then
-      IMAGE_URI="${IMAGE_NAME:-$REPOSITORY}"
+      IMAGE_URI="${IMAGE_NAME}"
     elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
       # :owner/:repo_name/:image_name
-      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME:-$REPONAME}"
+      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
     else
-      IMAGE_URI="${REGISTRY}/${IMAGE_NAME:-$REPOSITORY}"
+      IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
     fi
   fi
 
