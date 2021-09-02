@@ -468,27 +468,27 @@ _docker_builds() {
 
       _error_check
 
-      TAG_NAMES="${TAG_NAMES},${IMAGE_URI}:${TAG_NAME}-${P}"
+      TAG_NAMES="${TAG_NAMES} -a ${IMAGE_URI}:${TAG_NAME}-${P}"
   done
 
-  _docker_manifest ${TAG_NAME} "${TAG_NAMES:1}"
+  _docker_manifest ${IMAGE_URI}:${TAG_NAME} ${TAG_NAMES}
 
-  if [ "${LATEST}" == "true" ]; then
-    _docker_manifest latest "${TAG_NAMES:1}"
-  fi
+  # if [ "${LATEST}" == "true" ]; then
+  #   _docker_manifest ${IMAGE_URI}:latest -a ${TAG_NAMES}
+  # fi
 }
 
 _docker_manifest() {
-  _command "docker manifest create ${IMAGE_URI}:${1} ${2}"
-  docker manifest create ${IMAGE_URI}:${1} ${2}
+  _command "docker manifest create ${@}"
+  docker manifest create ${@}
 
   _error_check
 
-  _command "docker manifest inspect ${IMAGE_URI}:${1}"
-  docker manifest inspect ${IMAGE_URI}:${1}
+  _command "docker manifest inspect ${1}"
+  docker manifest inspect ${1}
 
-  _command "docker manifest push ${IMAGE_URI}:${1}"
-  docker manifest push ${IMAGE_URI}:${1}
+  _command "docker manifest push ${1}"
+  docker manifest push ${1}
 }
 
 _docker_buildx() {
@@ -502,16 +502,16 @@ _docker_buildx() {
   docker buildx create --use --name ops-${PLACE}
 
   _command "docker buildx build ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH}"
-  docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} ${BUILD_PATH} -f ${DOCKERFILE} --platform ${PLATFORM}
+  docker buildx build --push ${DOCKER_BUILD_ARGS} -t ${IMAGE_URI}:${TAG_NAME} -f ${DOCKERFILE} ${BUILD_PATH} --platform ${PLATFORM}
 
   _error_check
 
   _command "docker buildx imagetools inspect ${IMAGE_URI}:${TAG_NAME}"
   docker buildx imagetools inspect ${IMAGE_URI}:${TAG_NAME}
 
-  if [ "${LATEST}" == "true" ]; then
-    _docker_manifest latest ${IMAGE_URI}:${TAG_NAME}
-  fi
+  # if [ "${LATEST}" == "true" ]; then
+  #   _docker_manifest ${IMAGE_URI}:latest -a ${IMAGE_URI}:${TAG_NAME}
+  # fi
 }
 
 _docker_pre() {
