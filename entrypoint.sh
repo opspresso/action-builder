@@ -450,33 +450,33 @@ _docker_build() {
   fi
 }
 
-_docker_builds() {
-  TAG_NAMES=""
+# _docker_builds() {
+#   TAG_NAMES=""
 
-  ARR=(${PLATFORM//,/ })
+#   ARR=(${PLATFORM//,/ })
 
-  for V in ${ARR[@]}; do
-      P="${V//\//-}"
+#   for V in ${ARR[@]}; do
+#       P="${V//\//-}"
 
-      _command "docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}"
-      docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}
+#       _command "docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}"
+#       docker build ${DOCKER_BUILD_ARGS} --build-arg ARCH=${V} -t ${IMAGE_URI}:${TAG_NAME}-${P} -f ${DOCKERFILE} ${BUILD_PATH}
 
-      _error_check
+#       _error_check
 
-      _command "docker push ${IMAGE_URI}:${TAG_NAME}-${P}"
-      docker push ${IMAGE_URI}:${TAG_NAME}-${P}
+#       _command "docker push ${IMAGE_URI}:${TAG_NAME}-${P}"
+#       docker push ${IMAGE_URI}:${TAG_NAME}-${P}
 
-      _error_check
+#       _error_check
 
-      TAG_NAMES="${TAG_NAMES} -a ${IMAGE_URI}:${TAG_NAME}-${P}"
-  done
+#       TAG_NAMES="${TAG_NAMES} -a ${IMAGE_URI}:${TAG_NAME}-${P}"
+#   done
 
-  _docker_manifest ${IMAGE_URI}:${TAG_NAME} ${TAG_NAMES}
+#   _docker_manifest ${IMAGE_URI}:${TAG_NAME} ${TAG_NAMES}
 
-  # if [ "${LATEST}" == "true" ]; then
-  #   _docker_manifest ${IMAGE_URI}:latest -a ${TAG_NAMES}
-  # fi
-}
+#   # if [ "${LATEST}" == "true" ]; then
+#   #   _docker_manifest ${IMAGE_URI}:latest -a ${TAG_NAMES}
+#   # fi
+# }
 
 _docker_manifest() {
   _command "docker manifest create ${@}"
