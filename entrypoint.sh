@@ -641,7 +641,7 @@ EOF
     COUNT=$(aws ecr-public describe-repositories --region us-east-1 --output json | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
     if [ "x${COUNT}" == "x0" ]; then
       _command "aws ecr-public create-repository ${IMAGE_NAME}"
-      aws ecr create-repository --repository-name ${IMAGE_NAME} --region us-east-1
+      aws ecr-public create-repository --repository-name ${IMAGE_NAME} --region us-east-1
     fi
   else
     COUNT=$(aws ecr describe-repositories --output json | jq '.repositories[] | .repositoryName' | grep "\"${IMAGE_NAME}\"" | wc -l | xargs)
