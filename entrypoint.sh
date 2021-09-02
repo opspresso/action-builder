@@ -538,8 +538,6 @@ _docker_pre() {
   if [ -z "${IMAGE_URI}" ]; then
     if [ -z "${REGISTRY}" ]; then
       IMAGE_URI="${IMAGE_NAME}"
-    elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-      IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
     else
       IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
     fi
