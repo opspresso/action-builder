@@ -1,6 +1,7 @@
 # Opspresso Builder
 
-[![GitHub Actions status](https://github.com/opspresso/action-builder/workflows/Build-Push/badge.svg)](https://github.com/opspresso/action-builder/actions)
+[![Build-Tag](https://github.com/opspresso/action-builder/actions/workflows/tag.yml/badge.svg)](https://github.com/opspresso/action-builder/actions/workflows/tag.yml)
+[![Build-Cron](https://github.com/opspresso/action-builder/actions/workflows/cron.yaml/badge.svg)](https://github.com/opspresso/action-builder/actions/workflows/cron.yaml)
 [![GitHub Releases](https://img.shields.io/github/release/opspresso/action-builder.svg)](https://github.com/opspresso/action-builder/releases)
 
 ## Usage
