@@ -1,0 +1,38 @@
+name: Build-Cron
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Create Dockerfile
+        run: |
+          mkdir build
+          cat > build/Dockerfile<<EOF
+          FROM alpine
+          RUN echo "hello world"
+          ENTRYPOINT [ "sh", "-c", "echo -n 'Machine: ' && uname -m && echo -n 'Bits: ' && getconf LONG_BIT && echo 'goodbye world'" ]
+          EOF
+
+      - name: Build & Push to Docker Hub
+        uses: opspresso/action-builder@master
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERFILE: build/Dockerfile
+          IMAGE_NAME: opspresso/hello-world
+          TAG_NAME: action-builder
+          BUILDX: "true"

@@ -1,4 +1,4 @@
-FROM opspresso/builder:v0.10.1
+FROM opspresso/builder:v0.10.3
 
 LABEL "com.github.actions.name"="Opspresso Builder"
 LABEL "com.github.actions.description"="GitHub Action Builder"
