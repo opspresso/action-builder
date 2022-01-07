@@ -103,6 +103,8 @@ _version() {
 
     VERSION=$(cat /tmp/releases | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
 
+    # VERSION=$(git describe --abbrev=0 --tags)
+
     if [ -z "${VERSION}" ]; then
       VERSION="${MAJOR}.${MINOR}.0"
     fi
@@ -284,8 +286,6 @@ _release_id() {
   RELEASE_ID=$(cat /tmp/releases | TAG_NAME=${TAG_NAME} jq -r '.[] | select(.tag_name == env.TAG_NAME) | .id' | xargs)
 
   _result "RELEASE_ID: ${RELEASE_ID}"
-
-  _output "release_id" "${RELEASE_ID}"
 }
 
 _release_check() {
@@ -308,6 +308,8 @@ _release_check() {
   if [ -z "${RELEASE_ID}" ]; then
     _error "RELEASE_ID is not set."
   fi
+
+  _output "release_id" "${RELEASE_ID}"
 }
 
 _release_assets() {
@@ -341,6 +343,7 @@ _release() {
   AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
   _release_id
+
   if [ ! -z "${RELEASE_ID}" ]; then
     _command "github releases delete ${RELEASE_ID}"
     URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}"
