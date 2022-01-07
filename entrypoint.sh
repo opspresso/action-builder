@@ -17,6 +17,11 @@ _echo() {
   fi
 }
 
+_output() {
+  echo
+  echo "::set-output name=$1::$2"
+}
+
 _result() {
   echo
   _echo "# $@" 4
@@ -127,6 +132,8 @@ _version() {
   fi
 
   _result "VERSION: ${VERSION}"
+
+  _output "version" "${VERSION}"
 }
 
 _commit_pre() {
@@ -277,6 +284,8 @@ _release_id() {
   RELEASE_ID=$(cat /tmp/releases | TAG_NAME=${TAG_NAME} jq -r '.[] | select(.tag_name == env.TAG_NAME) | .id' | xargs)
 
   _result "RELEASE_ID: ${RELEASE_ID}"
+
+  _output "release_id" "${RELEASE_ID}"
 }
 
 _release_check() {
