@@ -393,6 +393,10 @@ _dispatch_pre() {
     EVENT_TYPE="gitops"
   fi
 
+  if [ -z "${CONTAINER}" ]; then
+    CONTAINER="app"
+  fi
+
   if [ -z "${PROJECT}" ]; then
     PROJECT="${GITHUB_REPOSITORY}"
   fi
@@ -417,7 +421,7 @@ _dispatch() {
   curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"username\":\"${USERNAME}\",\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\"}}" \
+    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"username\":\"${USERNAME}\",\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\",\"container\":\"${CONTAINER}\"}}" \
     https://api.github.com/repos/${GITOPS_REPO}/dispatches
 }
 
