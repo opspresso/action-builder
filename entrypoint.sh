@@ -394,7 +394,7 @@ _dispatch_pre() {
   fi
 
   if [ -z "${CONTAINER}" ]; then
-    CONTAINER="app"
+    CONTAINER=""
   fi
 
   if [ -z "${PROJECT}" ]; then
