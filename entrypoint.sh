@@ -416,7 +416,7 @@ _dispatch_pre() {
 _dispatch() {
   _dispatch_pre
 
-  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION}"
+  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION} ${CONTAINER}"
 
   curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
