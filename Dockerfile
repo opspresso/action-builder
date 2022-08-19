@@ -5,7 +5,7 @@ LABEL "com.github.actions.description"="GitHub Action Builder"
 LABEL "com.github.actions.icon"="box"
 LABEL "com.github.actions.color"="blue"
 
-LABEL version=v0.6.2
+LABEL version=v0.6.3
 LABEL repository="https://github.com/opspresso/action-builder"
 LABEL maintainer="Jungyoul Yu <me@nalbam.com>"
 LABEL homepage="https://opspresso.com/"
