@@ -124,7 +124,7 @@ _version() {
       if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
         VERSION="${VERSION}-${PR_NUM}"
       else
-        VERSION=""
+        VERSION="${VERSION}"
       fi
     fi
 
