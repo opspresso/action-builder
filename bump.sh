@@ -64,7 +64,7 @@ echo "VERSION=${VERSION}"
 # ./VERSION :: v1.2.3
 echo ${VERSION} > ./VERSION
 
-# ./action.yml :: docker://opspresso/action-builder:v0.2.9
+# ./action.yml :: docker://opspresso/action-builder:v1.2.3
 _replace "s/${BASENAME}:.*/${BASENAME}:${VERSION}/g" ./action.yml
 
 # ./Dockerfile :: LABEL version=v1.2.3

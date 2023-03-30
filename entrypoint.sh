@@ -412,12 +412,12 @@ _dispatch_pre() {
 _dispatch() {
   _dispatch_pre
 
-  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION} ${PHASE} ${CONTAINER}"
+  _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${PROJECT} ${VERSION} ${PHASE} ${CONTAINER} ${ACTION}"
 
   curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"username\":\"${USERNAME}\",\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\",\"phase\":\"${PHASE}\",\"container\":\"${CONTAINER}\"}}" \
+    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"username\":\"${USERNAME}\",\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\",\"phase\":\"${PHASE}\",\"container\":\"${CONTAINER}\",\"action\":\"${ACTION}\"}}" \
     https://api.github.com/repos/${GITOPS_REPO}/dispatches
 }
 
@@ -492,18 +492,18 @@ _docker_build() {
 #   # fi
 # }
 
-_docker_manifest() {
-  _command "docker manifest create ${@}"
-  docker manifest create ${@}
+# _docker_manifest() {
+#   _command "docker manifest create ${@}"
+#   docker manifest create ${@}
 
-  _error_check
+#   _error_check
 
-  _command "docker manifest inspect ${1}"
-  docker manifest inspect ${1}
+#   _command "docker manifest inspect ${1}"
+#   docker manifest inspect ${1}
 
-  _command "docker manifest push ${1}"
-  docker manifest push ${1}
-}
+#   _command "docker manifest push ${1}"
+#   docker manifest push ${1}
+# }
 
 _docker_buildx() {
   if [ -z "${PLATFORM}" ]; then
