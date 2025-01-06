@@ -153,7 +153,7 @@ _version() {
 
   _result "VERSION: ${VERSION}"
 
-  echo "VERSION=${VERSION}" >>${GITHUB_ENV}
+  echo "version=${VERSION}" >>${GITHUB_OUTPUT}
 }
 
 _commit_pre() {
@@ -323,7 +323,7 @@ _release_check() {
     _error "RELEASE_ID is not set."
   fi
 
-  echo "RELEASE_ID=${RELEASE_ID}" >>${GITHUB_ENV}
+  echo "release_id=${RELEASE_ID}" >>${GITHUB_OUTPUT}
 }
 
 _release_assets() {
