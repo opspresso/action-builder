@@ -102,19 +102,19 @@ _version() {
     VERSION="${MAJOR}.${MINOR}.${PATCH}"
     printf "${VERSION}" >./VERSION
   else
-    if [ "${GITHUB_TOKEN}" != "" ]; then
+    if [ -z "${GITHUB_TOKEN}" ]; then
+      URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+      curl \
+        -sSL \
+        ${URL} >/tmp/releases
+      _error_check
+    else
       AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
       URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
       curl \
         -sSL \
         -H "${AUTH_HEADER}" \
-        ${URL} >/tmp/releases
-      _error_check
-    else
-      URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-      curl \
-        -sSL \
         ${URL} >/tmp/releases
       _error_check
     fi
@@ -170,7 +170,7 @@ _commit_pre() {
   fi
 
   if [ -z "${GIT_BRANCH}" ]; then
-    GIT_BRANCH="master"
+    GIT_BRANCH="main"
   fi
 
   if [ -z "${MESSAGE}" ]; then
@@ -379,7 +379,7 @@ _release() {
     ${URL} <<END
 {
   "tag_name": "${TAG_NAME}",
-  "target_commitish": "${TARGET_COMMITISH:-master}",
+  "target_commitish": "${TARGET_COMMITISH:-main}",
   "name": "${NAME}",
   "body": "${BODY}",
   "draft": ${DRAFT},
