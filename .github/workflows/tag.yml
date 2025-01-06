@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
-      - name: Docker Build & Push to Docker Hub
-        uses: opspresso/action-builder@v0.5.13
+      - name: Build and push 🐳
+        uses: opspresso/action-builder@v0.6.6
         with:
           args: --docker
         env:
@@ -24,12 +24,3 @@ jobs:
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           TAG_NAME: ${{ github.ref }}
           LATEST: "true"
-
-      # - name: Docker Build & Push to GitHub Package
-      #   uses: opspresso/action-builder@v0.5.13
-      #   with:
-      #     args: --docker
-      #   env:
-      #     PASSWORD: ${{ secrets.GHP_TOKEN }}
-      #     REGISTRY: "docker.pkg.github.com"
-      #     TAG_NAME: ${{ github.ref }}

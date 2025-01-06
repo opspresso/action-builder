@@ -7,7 +7,19 @@ REPOSITORY=${GITHUB_REPOSITORY}
 USERNAME=${USERNAME:-$GITHUB_ACTOR}
 REPONAME=$(echo "${REPOSITORY}" | cut -d'/' -f2)
 
-command -v tput > /dev/null && TPUT=true
+command -v tput >/dev/null && TPUT=true
+
+# Function to check if a command is installed
+check_command() {
+  if ! command -v "$1" &> /dev/null; then
+    echo "$1 is not installed. Please install $1 to proceed."
+    exit 1
+  fi
+}
+
+# Check if required commands are installed
+check_command jq
+check_command curl
 
 _echo() {
   if [ "${TPUT}" != "" ] && [ "$2" != "" ]; then
@@ -50,29 +62,38 @@ _error() {
 
 _error_check() {
   RESULT=$?
-
   if [ ${RESULT} != 0 ]; then
-    _error ${RESULT}
+    _error "Command failed with exit code ${RESULT}"
   fi
 }
 
 _aws_pre() {
-  if [ -z "${AWS_ACCESS_KEY_ID}" ]; then
-    _error "AWS_ACCESS_KEY_ID is not set."
-  fi
-
-  if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
-    _error "AWS_SECRET_ACCESS_KEY is not set."
-  fi
-
   if [ -z "${AWS_REGION}" ]; then
     AWS_REGION="us-east-1"
+  fi
+
+  if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ]; then
+    # aws credentials
+    aws configure <<-EOF >/dev/null 2>&1
+${AWS_ACCESS_KEY_ID}
+${AWS_SECRET_ACCESS_KEY}
+${AWS_REGION}
+text
+EOF
+    _error_check
+  fi
+
+  AWS_ACCOUNT_ID="$(aws sts get-caller-identity --output json | jq '.Account' -r)"
+  _error_check
+
+  if [ -z "${AWS_ACCOUNT_ID}" ]; then
+    _error "AWS_ACCOUNT_ID is not set."
   fi
 }
 
 _version() {
   if [ ! -f ./VERSION ]; then
-    printf "v0.0.x" > ./VERSION
+    printf "v0.0.x" >./VERSION
   fi
 
   _result "GITHUB_REF: ${GITHUB_REF}"
@@ -84,7 +105,7 @@ _version() {
 
   if [ "${PATCH}" != "x" ]; then
     VERSION="${MAJOR}.${MINOR}.${PATCH}"
-    printf "${VERSION}" > ./VERSION
+    printf "${VERSION}" >./VERSION
   else
     if [ "${GITHUB_TOKEN}" != "" ]; then
       AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
@@ -93,12 +114,14 @@ _version() {
       curl \
         -sSL \
         -H "${AUTH_HEADER}" \
-        ${URL} > /tmp/releases
+        ${URL} >/tmp/releases
+      _error_check
     else
       URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
       curl \
         -sSL \
-        ${URL} > /tmp/releases
+        ${URL} >/tmp/releases
+      _error_check
     fi
 
     VERSION=$(cat /tmp/releases | jq -r '.[] | .tag_name' | grep "${MAJOR}.${MINOR}." | cut -d'-' -f1 | sort -Vr | head -1)
@@ -129,11 +152,13 @@ _version() {
     fi
 
     if [ "${VERSION}" != "" ]; then
-      printf "${VERSION}" > ./VERSION
+      printf "${VERSION}" >./VERSION
     fi
   fi
 
   _result "VERSION: ${VERSION}"
+
+  echo "VERSION=${VERSION}" >>${GITHUB_ENV}
 
   _output "version" "${VERSION}"
 }
@@ -170,17 +195,21 @@ _commit() {
 
   _command "git checkout ${GIT_BRANCH}"
   git checkout ${GIT_BRANCH}
+  _error_check
 
   _command "git add --all"
   git add --all
+  _error_check
 
   _command "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
+  _error_check
 
   HEADER=$(echo -n "${GITHUB_ACTOR}:${GITHUB_TOKEN}" | base64)
 
   _command "git push -u origin ${GIT_BRANCH}"
   git -c http.extraheader="AUTHORIZATION: basic ${HEADER}" push -u origin ${GIT_BRANCH}
+  _error_check
 
   # _command "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   # git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
@@ -206,18 +235,9 @@ _publish_pre() {
 _publish() {
   _publish_pre
 
-  # aws credentials
-  aws configure <<-EOF > /dev/null 2>&1
-${AWS_ACCESS_KEY_ID}
-${AWS_SECRET_ACCESS_KEY}
-${AWS_REGION}
-text
-EOF
-
   # aws s3 sync
   _command "aws s3 sync ${FROM_PATH} ${DEST_PATH}"
   aws s3 sync ${FROM_PATH} ${DEST_PATH} ${OPTIONS}
-
   _error_check
 
   if [ "${CF_RESET}" == "true" ]; then
@@ -228,8 +248,9 @@ EOF
       # aws cf reset
       CFID=$(aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Origin:Origins.Items[0].DomainName}[?contains(Origin,'${BUCKET}')] | [0]" | awk '{print $1}')
       if [ "${CFID}" != "" ]; then
-          _command "aws cloudfront create-invalidation ${CFID}"
-          aws cloudfront create-invalidation --distribution-id ${CFID} --paths "/*"
+        _command "aws cloudfront create-invalidation ${CFID}"
+        aws cloudfront create-invalidation --distribution-id ${CFID} --paths "/*"
+        _error_check
       fi
     fi
   fi
@@ -281,7 +302,7 @@ _release_id() {
   curl \
     -sSL \
     -H "${AUTH_HEADER}" \
-    ${URL} > /tmp/releases
+    ${URL} >/tmp/releases
 
   RELEASE_ID=$(cat /tmp/releases | TAG_NAME=${TAG_NAME} jq -r '.[] | select(.tag_name == env.TAG_NAME) | .id' | xargs)
 
@@ -302,19 +323,21 @@ _release_check() {
       break
     fi
 
-    CNT=$(( ${CNT} + 1 ))
+    CNT=$((${CNT} + 1))
   done
 
   if [ -z "${RELEASE_ID}" ]; then
     _error "RELEASE_ID is not set."
   fi
 
+  echo "RELEASE_ID=${RELEASE_ID}" >>${GITHUB_ENV}
+
   _output "release_id" "${RELEASE_ID}"
 }
 
 _release_assets() {
   LIST=/tmp/release-list
-  ls ${ASSET_PATH} | sort > ${LIST}
+  ls ${ASSET_PATH} | sort >${LIST}
 
   while read FILENAME; do
     FILEPATH=${ASSET_PATH}/${FILENAME}
@@ -334,7 +357,7 @@ _release_assets() {
       -H "${CONTENT_LENGTH_HEADER}" \
       --data-binary @${FILEPATH} \
       ${URL}
-  done < ${LIST}
+  done <${LIST}
 }
 
 _release() {
@@ -593,10 +616,6 @@ _docker() {
 _docker_ecr_pre() {
   _aws_pre
 
-  if [ -z "${AWS_ACCOUNT_ID}" ]; then
-    AWS_ACCOUNT_ID="$(aws sts get-caller-identity --output json | jq '.Account' -r)"
-  fi
-
   if [ -z "${BUILD_PATH}" ]; then
     BUILD_PATH="."
   fi
@@ -632,14 +651,6 @@ _docker_ecr_pre() {
 
 _docker_ecr() {
   _docker_ecr_pre
-
-  # aws credentials
-  aws configure <<-EOF > /dev/null 2>&1
-${AWS_ACCESS_KEY_ID}
-${AWS_SECRET_ACCESS_KEY}
-${AWS_REGION}
-text
-EOF
 
   if [ "${PUBLIC}" == "public" ]; then
     _command "aws ecr-public get-login-password --region us-east-1 ${REGISTRY}"
@@ -706,30 +717,31 @@ fi
 _result "[${CMD:2}] start..."
 
 case "${CMD:2}" in
-  version)
-    _version
-    ;;
-  commit)
-    _commit
-    ;;
-  publish)
-    _publish
-    ;;
-  release)
-    _release
-    ;;
-  dispatch)
-    _dispatch
-    ;;
-  docker)
-    _docker
-    ;;
-  ecr)
-    _docker_ecr
-    ;;
-  slack)
-    _slack
-    ;;
-  *)
-    _error
+version)
+  _version
+  ;;
+commit)
+  _commit
+  ;;
+publish)
+  _publish
+  ;;
+release)
+  _release
+  ;;
+dispatch)
+  _dispatch
+  ;;
+docker)
+  _docker
+  ;;
+ecr)
+  _docker_ecr
+  ;;
+slack)
+  _slack
+  ;;
+*)
+  _error
+  ;;
 esac

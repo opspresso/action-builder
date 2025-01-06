@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Create Dockerfile
         run: |
@@ -25,8 +27,8 @@ jobs:
           ENTRYPOINT [ "sh", "-c", "echo -n 'Machine: ' && uname -m && echo -n 'Bits: ' && getconf LONG_BIT && echo 'goodbye world'" ]
           EOF
 
-      - name: Build & Push to Docker Hub
-        uses: opspresso/action-builder@master
+      - name: Build and push 🐳
+        uses: opspresso/action-builder@v0.6.6
         with:
           args: --docker
         env:
