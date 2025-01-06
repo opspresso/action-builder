@@ -29,11 +29,6 @@ _echo() {
   fi
 }
 
-_output() {
-  echo
-  echo "::set-output name=$1::$2"
-}
-
 _result() {
   echo
   _echo "# $@" 4
@@ -159,8 +154,6 @@ _version() {
   _result "VERSION: ${VERSION}"
 
   echo "VERSION=${VERSION}" >>${GITHUB_ENV}
-
-  _output "version" "${VERSION}"
 }
 
 _commit_pre() {
@@ -331,8 +324,6 @@ _release_check() {
   fi
 
   echo "RELEASE_ID=${RELEASE_ID}" >>${GITHUB_ENV}
-
-  _output "release_id" "${RELEASE_ID}"
 }
 
 _release_assets() {
