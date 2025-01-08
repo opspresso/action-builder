@@ -196,8 +196,8 @@ _commit() {
   git diff
   _error_check
 
-  git diff >${SHELL_DIR}/target/git_diff.txt
-  COUNT=$(cat ${SHELL_DIR}/target/git_diff.txt | wc -l | xargs)
+  git diff >/tmp/git_diff.txt
+  COUNT=$(cat /tmp/git_diff.txt | wc -l | xargs)
 
   if [ "x${COUNT}" = "x0" ]; then
     _success "No changes to commit"
