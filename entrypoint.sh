@@ -188,21 +188,17 @@ _commit() {
 
   _command "git checkout ${GIT_BRANCH}"
   git checkout ${GIT_BRANCH}
-  _error_check
 
   _command "git add --all"
   git add --all
-  _error_check
 
   _command "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
-  _error_check
 
   HEADER=$(echo -n "${GITHUB_ACTOR}:${GITHUB_TOKEN}" | base64)
 
   _command "git push -u origin ${GIT_BRANCH}"
   git -c http.extraheader="AUTHORIZATION: basic ${HEADER}" push -u origin ${GIT_BRANCH}
-  _error_check
 
   # _command "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   # git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
