@@ -191,6 +191,9 @@ _commit() {
   _command "git checkout ${GIT_BRANCH}"
   git checkout ${GIT_BRANCH}
 
+  _command "git diff"
+  git diff
+
   _command "git add --all"
   git add --all
 
