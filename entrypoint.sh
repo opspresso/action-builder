@@ -36,7 +36,11 @@ _result() {
 
 _command() {
   echo
-  _echo "$ $@" 3
+  if [[ "$@" == *"${GITHUB_TOKEN}"* ]]; then
+    _echo "$ (command with sensitive data hidden)" 3
+  else
+    _echo "$ $@" 3
+  fi
 }
 
 _success() {
@@ -190,20 +194,32 @@ _commit() {
 
   _command "git checkout ${GIT_BRANCH}"
   git checkout ${GIT_BRANCH}
+  _error_check
 
   _command "git diff"
   git diff
+  _error_check
+
+  git diff >${SHELL_DIR}/target/git_diff.txt
+  COUNT=$(cat ${SHELL_DIR}/target/git_diff.txt | wc -l | xargs)
+
+  if [ "x${COUNT}" = "x0" ]; then
+    _success "No changes to commit"
+  fi
 
   _command "git add --all"
   git add --all
+  _error_check
 
   _command "git commit -m ${MESSAGE}"
   git commit -a --allow-empty-message -m "${MESSAGE}"
+  _error_check
 
   HEADER=$(echo -n "${GITHUB_ACTOR}:${GITHUB_TOKEN}" | base64)
 
   _command "git push -u origin ${GIT_BRANCH}"
   git -c http.extraheader="AUTHORIZATION: basic ${HEADER}" push -u origin ${GIT_BRANCH}
+  _error_check
 
   # _command "git push github.com/${GITHUB_REPOSITORY} ${GIT_BRANCH}"
   # git push -q https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git ${GIT_BRANCH}
@@ -352,6 +368,16 @@ _release_assets() {
   done <${LIST}
 }
 
+_curl_request() {
+  local url=$1
+  local method=$2
+  local headers=$3
+  local data=$4
+
+  curl -sSL -X ${method} ${headers} --data "${data}" ${url}
+  _error_check
+}
+
 _release() {
   _release_pre
 
@@ -362,31 +388,13 @@ _release() {
   if [ ! -z "${RELEASE_ID}" ]; then
     _command "github releases delete ${RELEASE_ID}"
     URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}"
-    curl \
-      -sSL \
-      -X DELETE \
-      -H "${AUTH_HEADER}" \
-      ${URL}
+    _curl_request ${URL} DELETE "-H \"${AUTH_HEADER}\""
     sleep 5
   fi
 
   _command "github releases create ${TAG_NAME} ${DRAFT} ${PRERELEASE}"
   URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-  curl \
-    -sSL \
-    -X POST \
-    -H "${AUTH_HEADER}" \
-    --data @- \
-    ${URL} <<END
-{
-  "tag_name": "${TAG_NAME}",
-  "target_commitish": "${TARGET_COMMITISH:-main}",
-  "name": "${NAME}",
-  "body": "${BODY}",
-  "draft": ${DRAFT},
-  "prerelease": ${PRERELEASE}
-}
-END
+  _curl_request ${URL} POST "-H \"${AUTH_HEADER}\"" "{\"tag_name\":\"${TAG_NAME}\",\"target_commitish\":\"${TARGET_COMMITISH:-main}\",\"name\":\"${NAME}\",\"body\":\"${BODY}\",\"draft\":${DRAFT},\"prerelease\":${PRERELEASE}}"
 
   _release_check
 
@@ -552,13 +560,8 @@ _docker_pre() {
     _error "PASSWORD is not set."
   fi
 
-  if [ -z "${BUILD_PATH}" ]; then
-    BUILD_PATH="."
-  fi
-
-  if [ -z "${DOCKERFILE}" ]; then
-    DOCKERFILE="Dockerfile"
-  fi
+  BUILD_PATH="${BUILD_PATH:-.}"
+  DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 
   if [ -z "${IMAGE_NAME}" ]; then
     if [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
@@ -572,7 +575,6 @@ _docker_pre() {
     if [ -z "${REGISTRY}" ]; then
       IMAGE_URI="${IMAGE_NAME}"
     elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
-      # :owner/:repo_name/:image_name
       IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
     else
       IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
