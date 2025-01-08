@@ -176,6 +176,8 @@ _commit_pre() {
   if [ -z "${MESSAGE}" ]; then
     if [ ! -z "${MESSAGE_PATH}" ] && [ -f "${MESSAGE_PATH}" ]; then
       MESSAGE="$(cat ${MESSAGE_PATH})"
+    else
+      MESSAGE="$(date +%Y%m%d-%H%M)"
     fi
   fi
 }
