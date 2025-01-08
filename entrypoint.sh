@@ -36,11 +36,7 @@ _result() {
 
 _command() {
   echo
-  if [[ "$@" == *"${GITHUB_TOKEN}"* ]]; then
-    _echo "$ (command with sensitive data hidden)" 3
-  else
-    _echo "$ $@" 3
-  fi
+  _echo "$ $@" 3
 }
 
 _success() {
@@ -368,16 +364,6 @@ _release_assets() {
   done <${LIST}
 }
 
-_curl_request() {
-  local url=$1
-  local method=$2
-  local headers=$3
-  local data=$4
-
-  curl -sSL -X ${method} ${headers} --data "${data}" ${url}
-  _error_check
-}
-
 _release() {
   _release_pre
 
@@ -388,13 +374,31 @@ _release() {
   if [ ! -z "${RELEASE_ID}" ]; then
     _command "github releases delete ${RELEASE_ID}"
     URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}"
-    _curl_request ${URL} DELETE "-H \"${AUTH_HEADER}\""
+    curl \
+      -sSL \
+      -X DELETE \
+      -H "${AUTH_HEADER}" \
+      ${URL}
     sleep 5
   fi
 
   _command "github releases create ${TAG_NAME} ${DRAFT} ${PRERELEASE}"
   URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-  _curl_request ${URL} POST "-H \"${AUTH_HEADER}\"" "{\"tag_name\":\"${TAG_NAME}\",\"target_commitish\":\"${TARGET_COMMITISH:-main}\",\"name\":\"${NAME}\",\"body\":\"${BODY}\",\"draft\":${DRAFT},\"prerelease\":${PRERELEASE}}"
+  curl \
+    -sSL \
+    -X POST \
+    -H "${AUTH_HEADER}" \
+    --data @- \
+    ${URL} <<END
+{
+  "tag_name": "${TAG_NAME}",
+  "target_commitish": "${TARGET_COMMITISH:-main}",
+  "name": "${NAME}",
+  "body": "${BODY}",
+  "draft": ${DRAFT},
+  "prerelease": ${PRERELEASE}
+}
+END
 
   _release_check
 
@@ -575,6 +579,7 @@ _docker_pre() {
     if [ -z "${REGISTRY}" ]; then
       IMAGE_URI="${IMAGE_NAME}"
     elif [ "${REGISTRY}" == "docker.pkg.github.com" ]; then
+      # :owner/:repo_name/:image_name
       IMAGE_URI="${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}"
     else
       IMAGE_URI="${REGISTRY}/${IMAGE_NAME}"
