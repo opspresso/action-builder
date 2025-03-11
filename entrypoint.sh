@@ -11,7 +11,7 @@ command -v tput >/dev/null && TPUT=true
 
 # Function to check if a command is installed
 check_command() {
-  if ! command -v "$1" &> /dev/null; then
+  if ! command -v "$1" &>/dev/null; then
     echo "$1 is not installed. Please install $1 to proceed."
     exit 1
   fi
@@ -98,6 +98,11 @@ _version() {
   MINOR=$(cat ./VERSION | xargs | cut -d'.' -f2)
   PATCH=$(cat ./VERSION | xargs | cut -d'.' -f3)
 
+  PRNUM=$(cat ./VERSION | xargs | cut -d'.' -f4)
+  if [ "${PRNUM}" == "x" ]; then
+    PATCH="x"
+  fi
+
   if [ "${PATCH}" != "x" ]; then
     VERSION="${MAJOR}.${MINOR}.${PATCH}"
     printf "${VERSION}" >./VERSION
@@ -110,7 +115,6 @@ _version() {
       _error_check
     else
       AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-
       URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
       curl \
         -sSL \
@@ -131,16 +135,17 @@ _version() {
 
     # new version
     if [ "${GITHUB_REF}" == "refs/heads/main" ] || [ "${GITHUB_REF}" == "refs/heads/master" ]; then
-      VERSION=$(echo ${VERSION} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+      # VERSION=$(echo ${VERSION} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+      VERSION=$(echo ${VERSION} | awk -F. '{if (NF>3) {print $1"."$2"."($3+1)} else {print $1"."$2"."($3+1)}}')
     else
       if [ "${GITHUB_REF}" != "" ]; then
         # refs/pull/1/merge
-        PR_CMD=$(echo "${GITHUB_REF}" | cut -d'/' -f2)
-        PR_NUM=$(echo "${GITHUB_REF}" | cut -d'/' -f3)
+        PRCMD=$(echo "${GITHUB_REF}" | cut -d'/' -f2)
+        PRNUM=$(echo "${GITHUB_REF}" | cut -d'/' -f3)
       fi
 
-      if [ "${PR_CMD}" == "pull" ] && [ "${PR_NUM}" != "" ]; then
-        VERSION="${VERSION}-${PR_NUM}"
+      if [ "${PRCMD}" == "pull" ] && [ "${PRNUM}" != "" ]; then
+        VERSION="${VERSION}-${PRNUM}"
       else
         VERSION="${VERSION}"
       fi
