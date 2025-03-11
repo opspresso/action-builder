@@ -135,8 +135,11 @@ _version() {
 
     # new version
     if [ "${GITHUB_REF}" == "refs/heads/main" ] || [ "${GITHUB_REF}" == "refs/heads/master" ]; then
-      # VERSION=$(echo ${VERSION} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-      VERSION=$(echo ${VERSION} | awk -F. '{if (NF>3) {print $1"."$2"."($3+1)} else {print $1"."$2"."($3+1)}}')
+      VERSION=$(echo ${VERSION} | awk -F. '{
+        if (NF==1) print $1".1";
+        else if (NF==2) print $1"."($2+1);
+        else if (NF>=3) print $1"."$2"."($3+1);
+      }')
     else
       if [ "${GITHUB_REF}" != "" ]; then
         # refs/pull/1/merge
