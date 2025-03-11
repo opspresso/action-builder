@@ -99,7 +99,7 @@ _version() {
   PATCH=$(cat ./VERSION | xargs | cut -d'.' -f3)
 
   PRNUM=$(cat ./VERSION | xargs | cut -d'.' -f4)
-  if [ "${PRNUM}" == "x" ]; then
+  if [ "${PRNUM}" == "dev0" ]; then
     PATCH="x"
   fi
 
