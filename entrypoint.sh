@@ -453,21 +453,10 @@ _dispatch() {
 
   _command "github dispatches create ${GITOPS_REPO} ${EVENT_TYPE} ${TARGET} ${PROJECT} ${VERSION} ${PHASE} ${CONTAINER} ${ACTION}"
 
-  client_payload="{"
-  client_payload="${client_payload}\"username\":\"${USERNAME}\""
-  client_payload="${client_payload}\",\"target\":\"${TARGET}\""
-  client_payload="${client_payload}\",\"project\":\"${PROJECT}\""
-  client_payload="${client_payload}\",\"version\":\"${VERSION}\""
-  client_payload="${client_payload}\",\"phase\":\"${PHASE}\""
-  client_payload="${client_payload}\",\"container\":\"${CONTAINER}\""
-  client_payload="${client_payload}\",\"action\":\"${ACTION}\""
-  client_payload="${client_payload}\",\"sha256\":\"${SHA256}\""
-  client_payload="${client_payload}\"}"
-
   curl -sL -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":${client_payload}}" \
+    -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"username\":\"${USERNAME}\",\"target\":\"${TARGET}\",\"project\":\"${PROJECT}\",\"version\":\"${VERSION}\",\"phase\":\"${PHASE}\",\"container\":\"${CONTAINER}\",\"action\":\"${ACTION}\",\"sha256\":\"${SHA256}\"}}" \
     https://api.github.com/repos/${GITOPS_REPO}/dispatches
 }
 
